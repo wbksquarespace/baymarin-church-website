@@ -258,6 +258,46 @@ body>.nav#nav .bm-navdrop-toggle:hover,body>.nav#nav .bm-navdrop-toggle:focus-vi
 body>.nav#nav .bm-navdrop-links a{color:#173d36}
 body>.nav#nav .bm-navdrop-links a:hover,body>.nav#nav .bm-navdrop-links a:focus-visible{background:#f5faf5;color:#10392f}
 body>.nav#nav .bm-header-pill:focus-visible,body>.nav#nav .menu-btn:focus-visible{outline:3px solid #173d36;outline-offset:3px}
+</style><style id="bm-starting-reference-v1">
+/* BayMarin Starting Point: spacious Sanctuary-inspired split, original BayMarin copy. */
+#internalPage:has(.bm-starting-page){background:#f1f2f2;padding:0;overflow:hidden}
+#internalPage:has(.bm-starting-page)>#pageKicker,#internalPage:has(.bm-starting-page)>#pageTitle,#internalPage:has(.bm-starting-page)>#pageDesc{display:none}
+#internalPage:has(.bm-starting-page)>#pagePanel{max-width:none;width:100%;padding:0;margin:0;border-radius:0;background:transparent;box-shadow:none}
+#internalPage:has(.bm-starting-page)>a.pill{display:none}
+.bm-starting-page{width:100%;color:#172f27;background:#f1f2f2}
+.bm-sp-intro{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(35px,6vw,112px);align-items:center;padding:clamp(80px,8vw,136px) clamp(30px,9vw,185px);min-height:700px}
+.bm-sp-copy{min-width:0}
+.bm-starting-page .bm-sp-copy h2{font-size:clamp(48px,5.1vw,87px);line-height:1.04;letter-spacing:-.065em;margin:0 0 48px;color:#121b18;font-weight:820}
+.bm-starting-page .bm-sp-copy h2 em{font-family:Georgia,serif;font-weight:400;letter-spacing:-.07em;color:#315d49}
+.bm-starting-page p{color:#263a32;line-height:1.78;font-size:clamp(16px,1.3vw,19px);max-width:710px;margin:0 0 23px}
+.bm-starting-page p strong{color:#182f26;font-weight:800}
+.bm-sp-photo-placeholder{width:100%;height:100%;min-height:490px;aspect-ratio:4/4.6;background:#dce7e1;border:2px dashed rgba(46,101,77,.3);border-radius:36px;display:grid;place-items:center;position:relative;overflow:hidden}
+.bm-sp-photo-placeholder:before{content:"";position:absolute;inset:20px;border:1px solid rgba(46,101,77,.18);border-radius:27px}
+.bm-sp-photo-placeholder span{font-size:13px;font-weight:800;letter-spacing:.16em;color:#678c7c}
+.bm-starting-page .bm-sp-cta{display:inline-flex;align-items:center;gap:12px;margin-top:10px;padding:17px 29px;font-size:13px;letter-spacing:.035em;white-space:normal}
+.bm-starting-page .bm-sp-note{font-size:14px;line-height:1.6;color:#657b6e;margin-top:19px}
+.bm-sp-next{text-align:center;padding:clamp(78px,8vw,120px) clamp(24px,7vw,110px);background:#fff}
+.bm-sp-next .kicker,.bm-sp-question .kicker{letter-spacing:.15em;color:#235643;font-weight:800}
+.bm-sp-next h2,.bm-sp-question h2{font-size:clamp(45px,5.5vw,90px);line-height:1.05;letter-spacing:-.06em;margin:18px 0 27px;color:#182c23}
+.bm-sp-next h2 em,.bm-sp-question h2 em{font-family:Georgia,serif;font-weight:400;color:#517965}
+.bm-sp-next>p{margin:0 auto 55px;max-width:730px}
+.bm-sp-cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:17px;text-align:left}
+.bm-sp-card{display:flex;flex-direction:column;min-height:345px;min-width:0;background:#e9f0eb;border-radius:22px;padding:30px;cursor:pointer;text-decoration:none;transition:transform .2s,background .2s}
+.bm-sp-card:nth-child(2){background:#dbeae1}.bm-sp-card:nth-child(3){background:#e1edeb}.bm-sp-card:nth-child(4){background:#eff0e9}
+.bm-sp-card:hover,.bm-sp-card:focus-visible{transform:translateY(-5px);background:#cfe2d7}
+.bm-sp-numeral{border:1px solid #7fa494;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;font-size:12px;color:#174738;font-weight:800}
+.bm-sp-card h3{font-size:clamp(23px,2vw,32px);line-height:1.16;margin:35px 0 16px;letter-spacing:-.05em;color:#16382d}
+.bm-sp-card p{font-size:16px;line-height:1.6;margin:0 0 25px;color:#3d5c4d}
+.bm-sp-arrow{margin-top:auto;font-size:12px;letter-spacing:.06em;font-weight:800;color:#174838}
+.bm-sp-question{display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:clamp(35px,5vw,90px);padding:clamp(75px,8vw,130px) clamp(30px,9vw,170px);background:#eff1f0}
+.bm-sp-question h2{margin-bottom:0}
+.bm-sp-question p{margin:0 0 24px}
+.bm-sp-question a[href^="mailto:"]{color:#1c5b45;text-decoration:underline;text-underline-offset:4px}
+.bm-sp-question .pill{border:0;cursor:pointer}
+@media(max-width:1100px){.bm-sp-intro{padding:70px 5vw;gap:38px}.bm-sp-cards{grid-template-columns:repeat(2,minmax(0,1fr))}.bm-sp-card{min-height:275px}}
+@media(max-width:780px){.bm-sp-intro{grid-template-columns:1fr;min-height:auto;gap:35px;padding:60px clamp(22px,5vw,48px)}.bm-sp-photo-placeholder{height:auto;min-height:380px;aspect-ratio:4/3}.bm-sp-question{grid-template-columns:1fr;gap:26px;padding:70px clamp(22px,5vw,48px)}}
+@media(max-width:550px){.bm-starting-page .bm-sp-copy h2{font-size:clamp(42px,10vw,58px);margin-bottom:30px}.bm-sp-intro{padding:48px 20px}.bm-sp-photo-placeholder{aspect-ratio:1/1.1;min-height:300px;border-radius:25px}.bm-sp-next{padding:68px 20px}.bm-sp-cards{grid-template-columns:1fr}.bm-sp-card{min-height:215px;padding:27px}.bm-sp-card h3{margin-top:20px}.bm-sp-next h2,.bm-sp-question h2{font-size:clamp(42px,10vw,60px)}.bm-sp-question{padding:60px 20px}}
+@media(prefers-reduced-motion:reduce){.bm-sp-card{transition:none}}
 </style></head><body><div class="topline">SUNDAYS AT 10:00 AM · GUZMAN HALL · SAN RAFAEL</div><header class="nav" id="nav"><a aria-label="BayMarin Home" class="wordmark" data-baymarin-target="home" role="button" tabindex="0">baymarin<span>CHURCH</span></a><div class="navright"><nav aria-label="Primary" class="desktopnav"><div class="bm-navdrop"><button type="button" class="bm-navdrop-toggle" aria-expanded="false">I'M NEW HERE <span>⌄</span></button><div class="bm-navdrop-links"><a data-baymarin-target="new" role="button" tabindex="0">Sundays</a><a data-baymarin-target="starting-point" role="button" tabindex="0">Starting Point</a><a data-baymarin-target="membership" role="button" tabindex="0">Membership Matters</a><a data-baymarin-target="about" role="button" tabindex="0">About Us</a></div></div><a data-baymarin-target="grow" role="button" tabindex="0">GROW</a><a data-baymarin-target="serve" role="button" tabindex="0">SERVE</a><a data-baymarin-target="resources" role="button" tabindex="0">RESOURCES</a></nav><div class="bm-header-actions"><a class="bm-header-pill" data-baymarin-target="give" role="button" tabindex="0">GIVE</a><a class="bm-header-pill" data-baymarin-target="new" role="button" tabindex="0">JOIN US</a></div><button aria-controls="menu" aria-expanded="false" aria-label="Open menu" class="menu-btn" id="menuBtn"><i></i></button></div></header>
 <div aria-label="BayMarin navigation" aria-modal="true" class="overlay" id="menu" role="dialog"><div class="overlay-top"><a aria-label="BayMarin home" class="wordmark" data-baymarin-target="home" role="button" tabindex="0">baymarin<span>CHURCH</span></a><button aria-label="Close menu" class="close" id="closeMenu">×</button></div><div class="menu-grid">
 <div class="menu-group"><button aria-expanded="false" class="accordion-trigger" type="button">I'm New Here<span aria-hidden="true">⌄</span></button><div class="accordion-links"><a data-baymarin-target="new" role="button" tabindex="0">Sundays</a><a data-baymarin-target="starting-point" role="button" tabindex="0">Starting Point</a><a data-baymarin-target="membership" role="button" tabindex="0">Membership Matters</a><a data-baymarin-target="about" role="button" tabindex="0">About Us</a></div></div>
@@ -298,7 +338,33 @@ new:["Sundays at BayMarin","A place for you this Sunday.",`<div class="bm-sunday
 <section class="bm34-faq"><span class="kicker">BEFORE YOU COME</span><h2>Frequently Asked <em>Questions.</em></h2><div class="bm34-questions"><details><summary>What time should I arrive?</summary><p>Our Sunday gathering begins at 10:00 AM. Arriving a little early gives you time to find Guzman Hall and get settled.</p></details><details><summary>Where do I park?</summary><p>We meet at Guzman Hall on the Dominican University campus, 50 Acacia Ave in San Rafael. We're confirming the best visitor parking and entry instructions; contact BayMarin if you need help before arriving.</p></details><details><summary>What should I wear?</summary><p>Come as you are. Wear whatever helps you feel comfortable.</p></details><details><summary>Is there a place for my kids?</summary><p>Families are welcome. We're confirming age-specific programming and childcare availability. Use Plan Your Visit to ask about your family's needs.</p></details><details><summary>How can I get connected?</summary><p>Start by joining us on Sunday. You can also explore Starting Point, community groups, or serving opportunities and reach out to the BayMarin team.</p></details></div></section>
 <section class="bm34-contact bm-question-section" aria-labelledby="bmQuestionTitle"><div class="bm-question-heading"><span class="kicker">LET US KNOW</span><h2 id="bmQuestionTitle">Have a <em>Question?</em></h2></div><div class="bm-question-details"><p>Our team would love to help! You can reach us at <a href="mailto:info@baymarin.org">info@baymarin.org</a>, and we'll get back to you as soon as we can.</p><button class="pill green bm-question-open" type="button" data-bm-question-open>Ask a Question</button></div></section>
 </div>`],
-"starting-point":["Starting Point","Find your next step at BayMarin.",panel('Your next step begins here','Starting Point details are being developed for BayMarin. Connect with the team to learn how to get involved.',action('Starting Point at BayMarin','Ask About Starting Point'))],
+"starting-point":["Starting Point","Come as you are. Start with a conversation.",`<div class="bm-starting-page">
+<section class="bm-sp-intro">
+<div class="bm-sp-copy">
+<h2>New to BayMarin?<br><em>Start Here!</em></h2>
+<p><strong>If you're new to BayMarin, we'd love for you to join us on a Sunday or simply get to know us a little better.</strong> We gather to explore what it means to follow Jesus in real life—through honest questions, meaningful relationships, and a sense that there's room for everyone.</p>
+<p>You don't need to have your faith all figured out. Whether you're curious, skeptical, returning to church, or looking for community, you're welcome to come as you are. Starting Point is a way to begin connecting, at your own pace.</p>
+<a class="pill green bm-sp-cta" href="https://baymarin.churchcenter.com/home" target="_blank" rel="noopener noreferrer">CONNECT THROUGH CHURCH CENTER <span aria-hidden="true">↗</span></a>
+<p class="bm-sp-note">Browse BayMarin's Church Center for current gatherings and ways to connect. No class or RSVP is required to start the conversation.</p>
+</div>
+<div class="bm-sp-photo-placeholder" role="img" aria-label="Photo space reserved for a future BayMarin Starting Point photo"><span>PHOTO COMING SOON</span></div>
+</section>
+<section class="bm-sp-next">
+<div class="kicker">FIND YOUR WAY</div>
+<h2>Your next <em>steps.</em></h2>
+<p>There's no single path you have to follow. Here are a few simple ways to get to know the BayMarin community.</p>
+<div class="bm-sp-cards">
+<a class="bm-sp-card" data-baymarin-target="new" role="button" tabindex="0"><span class="bm-sp-numeral">01</span><h3>Join us Sunday</h3><p>Come share a Sunday morning with us at Guzman Hall.</p><span class="bm-sp-arrow">EXPLORE SUNDAYS ↗</span></a>
+<a class="bm-sp-card" href="https://baymarin.churchcenter.com/home" target="_blank" rel="noopener noreferrer"><span class="bm-sp-numeral">02</span><h3>Stay connected</h3><p>Discover current opportunities and ways to connect through Church Center.</p><span class="bm-sp-arrow">CHURCH CENTER ↗</span></a>
+<a class="bm-sp-card" data-baymarin-target="grow" role="button" tabindex="0"><span class="bm-sp-numeral">03</span><h3>Find community</h3><p>Build relationships and explore what growing together can look like.</p><span class="bm-sp-arrow">GROW ↗</span></a>
+<a class="bm-sp-card" data-baymarin-target="serve" role="button" tabindex="0"><span class="bm-sp-numeral">04</span><h3>Make a difference</h3><p>Learn about opportunities to serve our neighbors and community.</p><span class="bm-sp-arrow">SERVE ↗</span></a>
+</div>
+</section>
+<section class="bm-sp-question">
+<div><span class="kicker">LET US KNOW</span><h2>Have a <em>Question?</em></h2></div>
+<div><p>Sometimes the best first step is just a conversation. We'd love to hear from you. You can email <a href="mailto:info@baymarin.org">info@baymarin.org</a>, and we'll be glad to help.</p><button type="button" class="pill green" data-bm-question-open>ASK A QUESTION</button></div>
+</section>
+</div>`],
 "membership":["Membership Matters","Discover what belonging means at BayMarin.",panel('Membership Matters','Membership information is being prepared. Contact the BayMarin team to learn more.',action('Membership at BayMarin','Ask About Membership'))],
 "about":["About Us","Get to know the heart of BayMarin.",panel('Who we are','BayMarin gathers a community committed to the way of Christ and finding our place in God’s Story.',`<a class="pill green" data-baymarin-target="team" role="button" tabindex="0">Meet Dave</a>`) ],
 expect:['What to Expect','A thoughtful, welcoming Sunday gathering.',panel('Come as you are','We gather to explore the way of Jesus through community, thoughtful teaching and shared spiritual rhythms. No insider knowledge required.',`<a class="pill green" data-baymarin-target="plan-visit" role="button" tabindex="0">Plan Your Visit</a>${action('Question about visiting BayMarin','Ask a Question')}`)],

@@ -77,6 +77,16 @@ exports.submitForm=onRequest({region:"us-west1",cors:["https://bay-marin-church-
  const email=string(data.email,200);
  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))return bad(res,400,"Please enter a valid email address.");
  if(isVisit){
+   const dateString=string(data.date,20);
+   if(!/^\d{4}-\d{2}-\d{2}$/.test(dateString))return bad(res,400,"Please choose a valid Sunday.");
+   const selected=new Date(dateString+"T12:00:00Z");
+   if(Number.isNaN(selected.getTime())||selected.toISOString().slice(0,10)!==dateString||selected.getUTCDay()!==0)
+    return bad(res,400,"BayMarin meets on Sundays. Please choose a Sunday.");
+   if(selected.getTime()<Date.now()-24*3600000||selected.getTime()>Date.now()+365*86400000)
+    return bad(res,400,"Please choose an upcoming Sunday within the next year.");
+ }
+
+ if(isVisit){
   if(!string(data.first,80)||!string(data.last,80)||!/^\d{4}-\d{2}-\d{2}$/.test(string(data.date,20))||
     !string(data.service,120)||!string(data.location,150)||!["Yes","No","Not sure"].includes(string(data.children,30)))
     return bad(res,400,"Please complete all required visit fields.");
@@ -133,7 +143,7 @@ function reminderMessage(record,stage){
  const when=stage==="before"?"in two days":"this morning";
  const subject=stage==="before"?"Your Sunday visit is coming up — BayMarin Church":"We're looking forward to seeing you today — BayMarin";
  return {from:mailFrom.value(),to:[record.email],reply_to:STAFF_EMAIL,subject,
-  text:"Hi "+short+",\n\nJust a friendly reminder: your BayMarin visit is "+when+"!\n\nSunday worship: 10:00 AM\nLocation: "+VISIT_ADDRESS+"\nGet directions: "+VISIT_MAP+"\n\nCome as you are. We're looking forward to meeting you. If your plans have changed, just reply to this email and let us know.\n\nBayMarin Church\ninfo@baymarin.org"};
+  text:"Hi "+short+",\n\nJust a friendly reminder: your BayMarin visit is "+when+"!\n\nSunday worship: 10:00 AM\nLocation: "+VISIT_ADDRESS+"\nGet directions: "+VISIT_MAP+"\n\nCome as you are. We're looking forward to meeting you. If your plans change or you would like to stop visit reminders, please reply to this email and let the BayMarin team know.\n\nBayMarin Church\ninfo@baymarin.org"};
 }
 exports.sendVisitReminders=onSchedule({schedule:"every 30 minutes",timeZone:VISIT_TIMEZONE,region:"us-west1",secrets:[mailKey,mailFrom],maxInstances:1,timeoutSeconds:120},async()=>{
  const db=getFirestore();

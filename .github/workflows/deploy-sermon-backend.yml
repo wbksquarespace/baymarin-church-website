@@ -42,4 +42,4 @@ jobs:
       - name: Deploy Firestore and Storage security rules
         run: firebase deploy --only firestore:rules,firestore:indexes,storage --project bay-marin-church-website --non-interactive
       - name: Deploy sermon publishing functions
-        run: firebase deploy --only functions:publishMessage,functions:latestMessage,functions:sermonFeed,functions:sermonHealth --project bay-marin-church-website --non-interactive
+        run: firebase deploy --only functions:publishMessage,functions:stageMessage,functions:reviewMessage,functions:finalizeMessage,functions:latestMessage,functions:sermonFeed,functions:sermonHealth --project bay-marin-church-website --non-interactive

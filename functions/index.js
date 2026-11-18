@@ -233,3 +233,91 @@ exports.stopVisitReminders=onRequest({region:"us-west1",cors:false,invoker:"publ
    res.status(200).type("html").send('<!doctype html><html><meta name="viewport" content="width=device-width,initial-scale=1"><title>BayMarin reminders</title><body style="background:#edf3ee;font:18px/1.6 Arial,sans-serif;color:#173e32;margin:0;padding:50px 22px"><main style="max-width:520px;padding:40px;margin:50px auto;background:#fff;border-radius:24px"><h1>BayMarin</h1><h2>Your visit reminders are off.</h2><p>We will not send any more automated visit reminders for this request. You are always welcome to join us or reach out with questions.</p><a href="https://bay-marin-church-website.web.app" style="color:#173e32">Back to BayMarin</a></main></body></html>');
  }catch(err){console.error("Reminder opt-out failed",err?.name||"unknown");res.status(503).send("Unable to update preferences. Please contact info@baymarin.org.");}
 });
+
+
+/* BayMarin media publishing endpoints. Deploy Cloud Functions and configure Firestore/Storage. */
+const {getAuth}=require("firebase-admin/auth");
+const {getStorage,getDownloadURL}=require("firebase-admin/storage");
+const {FieldValue}=require("firebase-admin/firestore");
+const MEDIA_ORIGINS=["https://bay-marin-church-website.web.app","https://bay-marin-church-website.firebaseapp.com","https://baymarin.org","https://www.baymarin.org"];
+const MEDIA_SITE="https://bay-marin-church-website.web.app";
+const MEDIA_FEED="https://us-west1-bay-marin-church-website.cloudfunctions.net/sermonFeed";
+const xmlSafe=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&apos;"}[c]));
+async function findPublishedMessages(max){
+ const snapshot=await getFirestore().collection("sermons").where("published","==",true).orderBy("date","desc").limit(max).get();
+ return snapshot.docs.map(doc=>({id:doc.id,...doc.data(),createdAt:undefined}));
+}
+exports.latestMessage=onRequest({region:"us-west1",cors:MEDIA_ORIGINS,invoker:"public",maxInstances:3},async(req,res)=>{
+ if(req.method!=="GET")return bad(res,405,"Method not allowed");
+ try{const messages=await findPublishedMessages(30);res.set("Cache-Control","public,max-age=120,s-maxage=120").json({ok:true,messages});}
+ catch(e){console.error("Messages query error",e?.name);bad(res,503,"Message library unavailable");}
+});
+exports.publishMessage=onRequest({region:"us-west1",cors:MEDIA_ORIGINS,invoker:"public",maxInstances:3,timeoutSeconds:45},async(req,res)=>{
+ res.set("Cache-Control","no-store");
+ if(req.method!=="POST")return bad(res,405,"Method not allowed");
+ try{
+  const authorization=req.get("authorization")||"";
+  if(!authorization.startsWith("Bearer "))return bad(res,401,"Sign in required");
+  const user=await getAuth().verifyIdToken(authorization.slice(7),true);
+  const grant=await getFirestore().collection("media_publishers").doc(user.uid).get();
+  if(!grant.exists||grant.data().active!==true)return bad(res,403,"Publisher approval required");
+  const d=req.body;
+  if(!d||typeof d!=="object")return bad(res,400,"Invalid request");
+  for(const [key,max] of [["title",160],["series",120],["speaker",120],["description",5000]])
+   if(typeof d[key]!=="string"||!d[key].trim()||d[key].trim().length>max)return bad(res,400,"Invalid "+key);
+  const day=String(d.date||"");
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(day)||Number.isNaN(Date.parse(day)))return bad(res,400,"Invalid sermon date");
+  const id=String(d.id||"");
+  if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id))return bad(res,400,"Invalid ID");
+  const folder="sermons/"+user.uid+"/"+id+"/";
+  const audioPath=String(d.audioPath||""),artworkPath=String(d.artworkPath||"");
+  if(!audioPath.startsWith(folder)||!/^message\.(mp3|m4a)$/i.test(audioPath.slice(folder.length)))return bad(res,400,"Invalid audio path");
+  if(artworkPath&&(!artworkPath.startsWith(folder)||!/^artwork\.(jpg|jpeg|png|webp)$/i.test(artworkPath.slice(folder.length))))return bad(res,400,"Invalid artwork path");
+  const bucket=getStorage().bucket(),audio=bucket.file(audioPath);
+  const [hasAudio]=await audio.exists();if(!hasAudio)return bad(res,400,"Audio wasn't uploaded");
+  const [meta]=await audio.getMetadata();
+  const audioBytes=Number(meta.size||0);
+  if(!audioBytes||audioBytes>262144000||!String(meta.contentType||"").startsWith("audio/"))return bad(res,400,"Invalid audio");
+  let artworkUrl="";
+  if(artworkPath){
+   const artwork=bucket.file(artworkPath),[exists]=await artwork.exists();
+   if(!exists)return bad(res,400,"Artwork wasn't uploaded");
+   const [artMeta]=await artwork.getMetadata();
+   if(Number(artMeta.size)>12582912||!String(artMeta.contentType||"").startsWith("image/"))return bad(res,400,"Invalid artwork");
+   artworkUrl=await getDownloadURL(artwork);
+  }
+  const audioUrl=await getDownloadURL(audio);
+  const record={title:d.title.trim(),series:d.series.trim(),speaker:d.speaker.trim(),
+   date:day,description:d.description.trim(),published:true,createdAt:FieldValue.serverTimestamp(),
+   authorUid:user.uid,audioPath,artworkPath,audioUrl,artworkUrl,audioBytes,audioType:meta.contentType||"audio/mpeg"};
+  const doc=getFirestore().collection("sermons").doc(id);
+  if((await doc.get()).exists)return bad(res,409,"Already published");
+  await doc.create(record);
+  res.status(201).json({ok:true,id});
+ }catch(e){console.error("Sermon publish failed",e?.name);bad(res,503,"Publish failed. Check permissions and storage setup.");}
+});
+exports.sermonFeed=onRequest({region:"us-west1",cors:false,invoker:"public",maxInstances:3},async(req,res)=>{
+ if(req.method!=="GET")return res.status(405).send("Method not allowed");
+ try{
+  const sermons=await findPublishedMessages(100);
+  const items=sermons.map(m=>{
+   const published=new Date(m.date+"T10:00:00Z").toUTCString();
+   return "<item><title>"+xmlSafe(m.title)+"</title><guid isPermaLink=\"false\">baymarin-"+xmlSafe(m.id)+"</guid>"+
+    "<link>"+MEDIA_SITE+"/#messages</link><description>"+xmlSafe(m.description)+"</description>"+
+    "<itunes:author>"+xmlSafe(m.speaker)+"</itunes:author><itunes:summary>"+xmlSafe(m.description)+"</itunes:summary>"+
+    "<pubDate>"+published+"</pubDate><enclosure url=\""+xmlSafe(m.audioUrl)+"\" length=\""+Number(m.audioBytes)+"\" type=\""+xmlSafe(m.audioType)+"\"/>"+
+    (m.artworkUrl?"<itunes:image href=\""+xmlSafe(m.artworkUrl)+"\"/>":"")+"</item>";
+  }).join("");
+  const xml='<?xml version="1.0" encoding="UTF-8"?>'+
+    '<rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:atom="http://www.w3.org/2005/Atom">'+
+    '<channel><title>BayMarin Church Messages</title><link>'+MEDIA_SITE+'</link>'+
+    '<atom:link href="'+MEDIA_FEED+'" rel="self" type="application/rss+xml"/>'+
+    '<description>Sunday teachings and conversations from BayMarin Church in San Rafael, California.</description>'+
+    '<language>en-us</language><itunes:author>BayMarin Church</itunes:author>'+
+    '<itunes:owner><itunes:name>BayMarin Church</itunes:name><itunes:email>info@baymarin.org</itunes:email></itunes:owner>'+
+    '<itunes:explicit>false</itunes:explicit><itunes:category text="Religion &amp; Spirituality"><itunes:category text="Christianity"/></itunes:category>'+
+    items+'</channel></rss>';
+  res.set("Content-Type","application/rss+xml; charset=utf-8");
+  res.set("Cache-Control","public,max-age=600,s-maxage=600").status(200).send(xml);
+ }catch(e){console.error("RSS failed",e?.name);res.status(503).send("Podcast feed unavailable");}
+});

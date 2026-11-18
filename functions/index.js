@@ -48,7 +48,7 @@ function createMail(data){
   subject:"We received your message — BayMarin Church",text:acknowledgement};
  return [staffMessage,replyMessage];
 }
-exports.submitForm=onRequest({region:"us-west1",cors:false,invoker:"public",secrets:[mailKey,mailFrom],maxInstances:5,timeoutSeconds:20},async(req,res)=>{
+exports.submitForm=onRequest({region:"us-west1",cors:["https://bay-marin-church-website.web.app","https://bay-marin-church-website.firebaseapp.com","https://baymarin.org","https://www.baymarin.org"],invoker:"public",secrets:[mailKey,mailFrom],maxInstances:5,timeoutSeconds:20},async(req,res)=>{
  res.set("Cache-Control","no-store");
  if(req.method!=="POST")return bad(res,405,"Method not allowed.");
  const origin=req.get("origin");

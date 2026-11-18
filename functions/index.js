@@ -359,3 +359,143 @@ exports.sermonFeed=onRequest({region:"us-west1",cors:false,invoker:"public",maxI
   res.set("Cache-Control","public,max-age=600,s-maxage=600").status(200).send(xml);
  }catch(e){console.error("RSS failed",e?.name);res.status(503).send("Podcast feed unavailable");}
 });
+
+
+/* Two-stage media publishing: draft/upload -> staff review -> explicit approval -> public RSS. */
+async function approvedMediaUser(req){
+ const auth=req.get("authorization")||"";
+ if(!auth.startsWith("Bearer "))throw Object.assign(Error("Sign in required"),{code:401});
+ let user;
+ try{user=await getAuth().verifyIdToken(auth.slice(7),true);}
+ catch(_){throw Object.assign(Error("Session expired; sign in again"),{code:401});}
+ const grant=await getFirestore().collection("media_publishers").doc(user.uid).get();
+ if(!grant.exists||grant.data()?.active!==true)throw Object.assign(Error("Publisher approval required"),{code:403});
+ return user;
+}
+const MEDIA_MIMES={
+ mp3:["audio/mpeg","audio/mp3"],m4a:["audio/mp4","audio/x-m4a"],
+ jpg:["image/jpeg"],jpeg:["image/jpeg"],png:["image/png"],webp:["image/webp"],
+ pdf:["application/pdf"],txt:["text/plain"],
+ docx:["application/vnd.openxmlformats-officedocument.wordprocessingml.document"],
+ pptx:["application/vnd.openxmlformats-officedocument.presentationml.presentation"]
+};
+async function verifiedMediaFile(bucket,uid,id,path,prefix,exts,limit,required=false){
+ if(!path){if(required)throw Object.assign(Error(prefix+" is required"),{code:400});return {path:"",url:"",bytes:0,contentType:""};}
+ if(typeof path!=="string")throw Object.assign(Error("Invalid attachment path"),{code:400});
+ const root="sermons/"+uid+"/"+id+"/";
+ const suffix=path.startsWith(root)?path.slice(root.length):"";
+ const extension=suffix.split(".").pop().toLowerCase();
+ if(!exts.includes(extension)||suffix!==prefix+"."+extension)throw Object.assign(Error("Invalid "+prefix+" file"),{code:400});
+ const file=bucket.file(path);
+ const [exists]=await file.exists();
+ if(!exists)throw Object.assign(Error("Upload incomplete: "+prefix),{code:400});
+ const [meta]=await file.getMetadata();
+ const bytes=Number(meta.size||0);
+ if(bytes<1024||bytes>limit||!MEDIA_MIMES[extension].includes(meta.contentType))
+  throw Object.assign(Error("Invalid "+prefix+" size or file type"),{code:400});
+ return {path,url:await getDownloadURL(file),bytes,contentType:meta.contentType};
+}
+async function mediaReceipt(to,record,stage){
+ // Receipt failures are reported but never disguised as successful email delivery.
+ if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to||""))return false;
+ const title=stage==="review"?"Your message is ready to review":"Your message has been published";
+ const link=stage==="review"?MEDIA_SITE+"/media/?draft="+encodeURIComponent(record.id):MEDIA_SITE+"/?message="+encodeURIComponent(record.id)+"#messages";
+ try{
+  const result=await fetch("https://api.resend.com/emails",{
+   method:"POST",headers:{"Authorization":"Bearer "+mailKey.value(),"Content-Type":"application/json"},
+   body:JSON.stringify({from:mailFrom.value(),to:[to],subject:title+" — BayMarin",
+    html:brandedEmail(title,stage==="review"?"MEDIA TEAM · REVIEW REQUIRED":"MEDIA TEAM · PUBLISHED",[
+     'Message: '+record.title+' · '+record.speaker+' · '+record.date,
+     stage==="review"?"Your uploads are saved as a private draft. Please listen to the entire recording, check the artwork and attachments, then sign into the dashboard and press Approve & Publish. The public website and podcast feed are not updated yet.":"The message is published in the BayMarin library and church podcast RSS feed. If connected, Spotify will pick it up on its own refresh schedule."
+    ],stage==="review"?"REVIEW DRAFT":"VIEW MESSAGE",link)})
+   ,signal:AbortSignal.timeout(12000)});
+  return result.ok;
+ }catch(e){console.error("Media receipt failed",e?.name);return false;}
+}
+exports.stageMessage=onRequest({region:"us-west1",cors:MEDIA_ORIGINS,invoker:"public",maxInstances:3,timeoutSeconds:90,secrets:[mailKey,mailFrom]},async(req,res)=>{
+ res.set("Cache-Control","no-store");
+ if(req.method!=="POST")return bad(res,405,"Method not allowed");
+ try{
+  const user=await approvedMediaUser(req),d=req.body;
+  if(!d||typeof d!=="object"||Array.isArray(d))return bad(res,400,"Invalid request");
+  const id=string(d.id,64),day=string(d.date,20);
+  if(!/^[a-f0-9-]{36}$/i.test(id)||!/^\d{4}-\d{2}-\d{2}$/.test(day)||Number.isNaN(Date.parse(day)))return bad(res,400,"Invalid message ID or date");
+  for(const k of ["title","series","speaker","description"]){if(!string(d[k],k==="description"?5000:160))return bad(res,400,k+" is required");}
+  const email=string(d.confirmationEmail,200);
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))return bad(res,400,"Enter a valid confirmation email");
+  const topics=Array.isArray(d.topics)?[...new Set(d.topics.map(x=>string(x,80)).filter(Boolean))].slice(0,8):[];
+  const speakerTitle=string(d.speakerTitle,120),speakerChurch=string(d.speakerChurch,160);
+  const bucket=getStorage().bucket();
+  const results={};
+  for(const [key,prefix,ext,limit,required] of [
+    ["audio","message",["mp3","m4a"],262144000,true],
+    ["artwork","artwork",["jpg","jpeg","png","webp"],12582912,false],
+    ["seriesArtwork","seriesArtwork",["jpg","jpeg","png","webp"],12582912,false],
+    ["notes","notes",["pdf","docx","txt"],15728640,false],
+    ["slides","slides",["pdf","pptx"],52428800,false],
+    ["transcript","transcript",["pdf","txt"],15728640,false],
+    ["photo1","photo1",["jpg","jpeg","png","webp"],12582912,false],
+    ["photo2","photo2",["jpg","jpeg","png","webp"],12582912,false],
+    ["photo3","photo3",["jpg","jpeg","png","webp"],12582912,false]
+  ])results[key]=await verifiedMediaFile(bucket,user.uid,id,d[key+"Path"],prefix,ext,limit,required);
+  const record={
+   id,title:string(d.title,160),series:string(d.series,120),speaker:string(d.speaker,120),
+   speakerTitle,speakerChurch,description:string(d.description,5000),date:day,topics,
+   authorUid:user.uid,confirmationEmail:email,reviewStatus:"pending_review",published:false,
+   allowDownload:d.allowDownload===true,allowShare:d.allowShare!==false,
+   shareResources:d.shareResources===true,allowTranscript:d.allowTranscript===true,
+   transcriptText:d.allowTranscript===true&&results.transcript.path.endsWith(".txt")?string(d.transcriptText,80000):"",
+   audioPath:results.audio.path,audioUrl:results.audio.url,audioBytes:results.audio.bytes,audioType:results.audio.contentType,
+   artworkPath:results.artwork.path,artworkUrl:results.artwork.url,
+   seriesArtworkPath:results.seriesArtwork.path,seriesArtworkUrl:results.seriesArtwork.url,
+   notesPath:results.notes.path,notesUrl:d.shareResources===true?results.notes.url:"",
+   slidesPath:results.slides.path,slidesUrl:d.shareResources===true?results.slides.url:"",
+   transcriptPath:results.transcript.path,transcriptUrl:d.allowTranscript===true?results.transcript.url:"",
+   photos:[results.photo1,results.photo2,results.photo3].filter(x=>x.path).map(x=>({path:x.path,url:x.url})),
+   createdAt:FieldValue.serverTimestamp(),updatedAt:FieldValue.serverTimestamp()
+  };
+  const doc=getFirestore().collection("sermons").doc(id);
+  // Creating is atomic; a repeated request cannot overwrite a previously approved sermon.
+  await doc.create(record);
+  const emailed=await mediaReceipt(email,record,"review");
+  return res.status(201).json({ok:true,id,reviewStatus:"pending_review",emailSent:emailed,reviewUrl:MEDIA_SITE+"/media/?draft="+encodeURIComponent(id)});
+ }catch(e){
+  if(e.code===6||e.code===409)return bad(res,409,"A draft already exists for this message");
+  console.error("Stage media draft failed",e?.name);
+  return bad(res,e.code>=400&&e.code<500?e.code:503,e.code>=400&&e.code<500?e.message:"Draft could not be saved. Check Firebase setup and permissions.");
+ }
+});
+exports.reviewMessage=onRequest({region:"us-west1",cors:MEDIA_ORIGINS,invoker:"public",maxInstances:3,timeoutSeconds:30},async(req,res)=>{
+ res.set("Cache-Control","no-store");
+ if(req.method!=="GET")return bad(res,405,"Method not allowed");
+ try{
+  const user=await approvedMediaUser(req),id=string(req.query.id,64);
+  if(!/^[a-f0-9-]{36}$/i.test(id))return bad(res,400,"Invalid message ID");
+  const snap=await getFirestore().collection("sermons").doc(id).get();
+  if(!snap.exists||snap.data()?.authorUid!==user.uid)return bad(res,404,"Draft not found");
+  const d=snap.data();
+  const {confirmationEmail,...safe}=d;
+  return res.json({ok:true,message:{id,...safe,createdAt:undefined,updatedAt:undefined}});
+ }catch(e){return bad(res,e.code>=400&&e.code<500?e.code:503,e.code>=400&&e.code<500?e.message:"Unable to open draft");}
+});
+exports.finalizeMessage=onRequest({region:"us-west1",cors:MEDIA_ORIGINS,invoker:"public",maxInstances:3,timeoutSeconds:45,secrets:[mailKey,mailFrom]},async(req,res)=>{
+ res.set("Cache-Control","no-store");
+ if(req.method!=="POST")return bad(res,405,"Method not allowed");
+ try{
+  const user=await approvedMediaUser(req),id=string(req.body?.id,64);
+  if(!/^[a-f0-9-]{36}$/i.test(id)||req.body?.approved!==true)return bad(res,400,"Explicit review approval required");
+  const ref=getFirestore().collection("sermons").doc(id);
+  // Atomic state transition prevents accidental double publication.
+  const published=await getFirestore().runTransaction(async tx=>{
+   const snap=await tx.get(ref);
+   if(!snap.exists||snap.data().authorUid!==user.uid)throw Object.assign(Error("Draft not found"),{code:404});
+   const m=snap.data();
+   if(m.published||m.reviewStatus!=="pending_review")throw Object.assign(Error("Message has already been processed"),{code:409});
+   tx.update(ref,{published:true,reviewStatus:"published",approvedBy:user.uid,approvedAt:FieldValue.serverTimestamp(),updatedAt:FieldValue.serverTimestamp()});
+   return {id,title:m.title,date:m.date,speaker:m.speaker,confirmationEmail:m.confirmationEmail};
+  });
+  const emailed=await mediaReceipt(published.confirmationEmail,published,"published");
+  return res.json({ok:true,id,emailSent:emailed,libraryUrl:MEDIA_SITE+"/?message="+encodeURIComponent(id)+"#messages",
+   podcastFeed:MEDIA_FEED,spotifyStatus:"RSS available when feed is connected; Spotify ingestion not confirmed"});
+ }catch(e){console.error("Finalize media failed",e?.name);return bad(res,e.code>=400&&e.code<500?e.code:503,e.code>=400&&e.code<500?e.message:"Publication could not complete");}
+});

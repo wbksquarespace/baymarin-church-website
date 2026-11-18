@@ -1,0 +1,12 @@
+{
+  "name": "baymarin-form-service",
+  "private": true,
+  "version": "1.0.0",
+  "engines": {
+    "node": "22"
+  },
+  "main": "index.js",
+  "dependencies": {
+    "firebase-functions": "^6.4.0"
+  }
+}

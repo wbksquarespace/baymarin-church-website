@@ -24,7 +24,7 @@ jobs:
         with:
           node-version: '22'
       - name: Install dependencies
-        run: npm --prefix functions ci --omit=dev
+        run: npm --prefix functions install --omit=dev --no-audit --no-fund
       - name: Install Firebase CLI
         run: npm install --global firebase-tools
       - name: Validate functions JavaScript

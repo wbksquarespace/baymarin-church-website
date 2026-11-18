@@ -32,5 +32,11 @@ jobs:
       - name: Install Firebase CLI
         run: npm install --global firebase-tools
 
+      - name: Install approved BayMarin building photograph
+        run: |
+          test -s 'assets/BayMarin Community Church Sign.png'
+          mkdir -p BayMarin_Firebase_Master_V36/public/assets
+          cp 'assets/BayMarin Community Church Sign.png' 'BayMarin_Firebase_Master_V36/public/assets/baymarin-church-sign.png'
+
       - name: Deploy to Firebase Hosting
         run: firebase deploy --only hosting --project bay-marin-church-website --non-interactive

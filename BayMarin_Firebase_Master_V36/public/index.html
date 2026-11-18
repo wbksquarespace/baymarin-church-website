@@ -310,6 +310,12 @@ body>.nav#nav .bm-header-pill:focus-visible,body>.nav#nav .menu-btn:focus-visibl
 #homepage .bm-video-player.video-card::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(to bottom,#021b174a,transparent 34%,transparent 75%,#021b1752)}
 #homepage .bm-video-player .bm-welcome-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
 #homepage .bm-video-player .bm-story-label{position:absolute;z-index:2;top:17px;left:17px;border-radius:15px;background:#0d201cbf;color:white;padding:10px 16px;font:600 clamp(14px,1.1vw,20px)/1.3 Georgia,serif;letter-spacing:0}
+/* Portrait welcome video: keep the complete 9:16 frame visible on every screen. */
+#homepage .bm-story-stage{width:min(960px,92%)}
+#homepage .bm-video-player.video-card{aspect-ratio:auto!important;height:clamp(440px,65vw,720px);display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 35%,#315c4d 0%,#132e27 65%,#0c211c 100%);border:1px solid #ffffff26;border-radius:20px;overflow:hidden}
+#homepage .bm-video-player .bm-welcome-video{position:relative;inset:auto;width:auto;height:100%;max-width:100%;aspect-ratio:512 / 910;object-fit:contain;box-shadow:0 0 65px #061e1880}
+#homepage .bm-video-player .bm-story-label{top:18px;left:18px}
+@media(max-width:680px){#homepage .bm-story-stage{width:94%}#homepage .bm-video-player.video-card{height:auto;aspect-ratio:9 / 16!important;max-height:80svh;border-radius:14px}#homepage .bm-video-player .bm-welcome-video{position:absolute;inset:0;width:100%;height:100%;aspect-ratio:auto;object-fit:contain}#homepage .bm-video-player .bm-story-label{font-size:12px;padding:7px 10px}}
 #homepage .bm-video-awaiting{position:absolute;z-index:3;left:50%;bottom:26px;transform:translateX(-50%);border-radius:100px;padding:10px 17px;background:#0d201cc9;color:#fff;font-size:clamp(10px,.9vw,13px);font-weight:700;letter-spacing:.1em;white-space:nowrap}
 #homepage .bm-video-awaiting[hidden]{display:none}
 #homepage .bm-video-sound{position:absolute;z-index:4;right:18px;bottom:18px;border-radius:100px;padding:10px 16px;background:#f7faf5;color:#173e32;border:0;font-weight:700;cursor:pointer}

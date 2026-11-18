@@ -639,7 +639,7 @@ body.bm-leader-modal-open{overflow:hidden}
 <footer class="footer"><div><div class="wordmark">baymarin<span>CHURCH</span></div><p>Gathering a community committed to<br/>the way of Christ.</p></div><div><h3>Explore</h3><a data-baymarin-target="new" role="button" tabindex="0">I'm New Here</a><a data-baymarin-target="grow" role="button" tabindex="0">Grow</a><a data-baymarin-target="serve" role="button" tabindex="0">Serve</a><a data-baymarin-target="resources" role="button" tabindex="0">Resources</a></div><div><h3>Gather with us</h3><p>Sundays at 10 AM<br/>Guzman Hall, Dominican University<br/>San Rafael, California</p><a href="mailto:info@baymarin.org">info@baymarin.org</a></div><small>BayMarin Church · Design prototype · Photography provided by BayMarin project · Interactive prototype; original church video pending</small></footer><button aria-label="Back to top of this page" title="Back to top" class="backtop" id="backtop" type="button"><svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true" focusable="false"><path d="M12 20V4M4.5 11.5 12 4l7.5 7.5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
 <script>
 const MAP='https://www.google.com/maps/search/?api=1&query=Guzman+Hall+Dominican+University+50+Acacia+Ave+San+Rafael+CA';
-const action=(subject,label='Email BayMarin')=>`<a class="pill green" href="mailto:info@baymarin.org?subject=${encodeURIComponent(subject)}">${label}</a>`;
+const action=(subject,label='Connect with BayMarin')=>`<button type="button" class="pill green" data-bm-question-open data-bm-form-topic="${subject}">${label}</button>`;
 const panel=(heading,copy,actions='')=>`<h2>${heading}</h2><p>${copy}</p><div class="page-actions">${actions}</div>`;
 const pages={
 new:["Sundays at BayMarin","A place for you this Sunday.",`<div class="bm-sunday34">
@@ -840,7 +840,7 @@ document.getElementById('signupBtn')?.addEventListener('click',async function(){
 <form id="bmQuestionForm" class="bm-question-form">
 <div class="bm-question-field"><label for="bmQuestionName">Your name *</label><input id="bmQuestionName" name="name" autocomplete="name" required maxlength="120"></div>
 <div class="bm-question-field"><label for="bmQuestionEmail">Email address *</label><input id="bmQuestionEmail" name="email" type="email" autocomplete="email" required maxlength="200"></div>
-<div class="bm-question-field wide"><label for="bmQuestionBody">How can we help? *</label><textarea id="bmQuestionBody" name="message" required maxlength="2500" placeholder="Tell us what you'd like to know..."></textarea></div>
+<div class="bm-question-field"><label for="bmQuestionPhone">Phone (optional)</label><input id="bmQuestionPhone" name="phone" type="tel" autocomplete="tel"></div><div class="bm-question-field"><label for="bmQuestionTopic">Interested in</label><select id="bmQuestionTopic" name="topic"><option>General question</option><option>Plan a visit</option><option>Starting Point</option><option>Groups and community</option><option>Serving</option><option>Prayer request</option><option>Pastoral care</option><option>Membership</option></select></div><div class="bm-question-field wide"><label for="bmQuestionBody">How can we help? *</label><textarea id="bmQuestionBody" name="message" required maxlength="2500" placeholder="Tell us what you'd like to know..."></textarea></div>
 <div class="bm-question-field wide">
 <button class="bm-question-submit" type="submit">Submit My Message</button>
 <p class="bm-question-note">Your message will be sent to info@baymarin.org. You’ll receive a confirmation email, and our team aims to respond within 24–48 hours.</p>
@@ -857,7 +857,7 @@ document.getElementById('signupBtn')?.addEventListener('click',async function(){
   if(!modal||!form)return;
   function openQuestion(){previousFocus=document.activeElement;modal.hidden=false;document.body.style.overflow='hidden';status.textContent='';document.getElementById('bmQuestionName').focus();}
   function closeQuestion(){modal.hidden=true;document.body.style.overflow='';if(previousFocus&&previousFocus.isConnected)previousFocus.focus();}
-  document.addEventListener('click',function(e){const button=e.target.closest('[data-bm-question-open]');if(button){e.preventDefault();openQuestion();}if(e.target===modal)closeQuestion();});
+  document.addEventListener('click',function(e){const button=e.target.closest('[data-bm-question-open]');if(button){e.preventDefault();openQuestion();const topic=button.getAttribute('data-bm-form-topic');const field=document.getElementById('bmQuestionTopic');if(topic&&field){const match=[...field.options].find(o=>o.text.toLowerCase()===topic.toLowerCase());if(match)field.value=match.value;else document.getElementById('bmQuestionBody').value='Regarding: '+topic+'\n';}}if(e.target===modal)closeQuestion();});
   close.addEventListener('click',closeQuestion);
   document.addEventListener('keydown',function(e){
     if(modal.hidden)return;
@@ -978,4 +978,4 @@ document.addEventListener('click',function(event){const card=event.target.closes
  document.addEventListener('click',event=>{if(event.target.closest('[data-baymarin-target="messages"]'))setTimeout(renderArchive,30)});
  fetch(endpoint,{mode:'cors'}).then(r=>r.ok?r.json():Promise.reject(Error('Not yet active'))).then(d=>{if(d.ok)syncLibrary(d.messages)}).catch(()=>{});
 })();
-</script></body></html>
+</script><script id="bm-inquiry-link-routing">document.addEventListener('click',function(e){const a=e.target.closest('a[href^="mailto:info@baymarin.org"]');if(!a||a.closest('footer'))return;e.preventDefault();const b=document.createElement('button');b.setAttribute('data-bm-question-open','');b.setAttribute('data-bm-form-topic',a.textContent.trim());b.hidden=true;document.body.appendChild(b);b.click();b.remove();},true);</script></body></html>

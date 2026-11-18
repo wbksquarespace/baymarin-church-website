@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "public": "public",
+    "public": "BayMarin_Firebase_Master_V36/public",
     "ignore": [
       "firebase.json",
       "**/.*",

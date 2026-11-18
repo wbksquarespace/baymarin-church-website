@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#173f32">
+<title>Media Dashboard | BayMarin Church</title>
+<style>
+:root{--forest:#163f33;--green:#24694d;--sage:#b5d4bf;--cream:#f6f7f1;--ink:#18362c;--muted:#60776b;--border:#cbdbd0}
+*{box-sizing:border-box}body{margin:0;background:var(--cream);font:16px/1.55 system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:var(--ink)}
+button,input,textarea,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.5;cursor:not-allowed}
+a{color:var(--green)}[hidden]{display:none!important}
+header{background:var(--forest);color:#fff;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:20px clamp(18px,5vw,72px)}
+.logo{font-size:27px;font-weight:850;letter-spacing:-.065em;line-height:1}.logo small{display:block;font-size:10px;letter-spacing:.23em;font-weight:600;margin-top:8px}
+.head-actions{display:flex;align-items:center;gap:16px;flex-wrap:wrap}.head-actions a{font-size:13px;text-decoration:none;color:#e1f1e5}.head-actions button{border:1px solid #9dc4a9;background:transparent;color:#fff;border-radius:40px;padding:9px 16px}
+main{max-width:1270px;margin:auto;padding:clamp(30px,5vw,76px) clamp(15px,4vw,46px)}
+.kicker{font-size:12px;font-weight:850;letter-spacing:.16em;color:#397c5d}
+h1{font-size:clamp(48px,7vw,89px);letter-spacing:-.075em;line-height:1.05;margin:14px 0 19px}
+h1 em{color:#689878;font:italic 400 1em/1 Georgia,serif}
+.intro{font-size:clamp(16px,1.6vw,19px);max-width:830px;color:#557162;margin-bottom:34px}
+.panel{background:white;border:1px solid #e1eae2;border-radius:23px;padding:clamp(22px,3vw,39px);box-shadow:0 12px 32px #173f3210}
+.panel h2{font-size:clamp(25px,3vw,37px);line-height:1.2;letter-spacing:-.05em;margin:0 0 24px}
+.layout{display:grid;grid-template-columns:minmax(0,1.18fr) minmax(0,.82fr);gap:24px;align-items:start}
+.field{margin:0 0 21px;min-width:0}.field>label,.group-label{display:block;font-size:13px;font-weight:800;margin-bottom:8px}
+.field input:not([type=checkbox]),.field select,.field textarea{width:100%;min-height:48px;border:1px solid var(--border);border-radius:11px;padding:12px 14px;background:#fbfdfb;color:var(--ink);min-width:0}
+.field textarea{resize:vertical;min-height:118px}.field input:focus-visible,.field select:focus-visible,.field textarea:focus-visible{outline:3px solid #99ceb0;outline-offset:1px}
+.pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
+.upload{background:#edf5ee;border:1px dashed #9ebfa9;padding:18px;border-radius:14px}.upload input{background:transparent!important;padding:7px 0!important;border:0!important;font-size:13px}
+.hint{display:block;color:var(--muted);font-size:12px;margin-top:8px;line-height:1.5}
+.options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:14px;background:#f6faf6;border:1px solid #d4e4d8;border-radius:11px}
+.options label,.checks label{display:flex;align-items:flex-start;gap:9px;font-size:13px;font-weight:650}
+.options input,.checks input{accent-color:var(--forest);width:17px;height:17px;flex:none;margin:2px 0}
+.checks{display:grid;gap:12px;background:#f6faf6;padding:16px;border-radius:12px}
+.btn{border-radius:99px;border:1px solid #bad0bf;padding:13px 22px;font-size:13px;font-weight:850;min-height:47px}
+.btn.primary{background:var(--forest);border-color:var(--forest);color:#fff}
+.btn.light{background:#e4efe6;color:var(--forest)}
+.btn.outline{background:transparent;color:var(--forest)}
+.buttons{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.steps{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:25px}.step{border:1px solid #c6d8cb;border-radius:90px;padding:8px 14px;font-size:12px;font-weight:800;color:#4f705e;background:white}.step.active{background:var(--forest);color:white}
+#notice{margin-top:19px;color:#235a43;line-height:1.6;white-space:pre-wrap;font-size:14px;min-height:22px}
+.preview-art{width:100%;aspect-ratio:1.56;background:linear-gradient(130deg,#123f32,#75aa83);border-radius:16px;display:grid;place-items:center;text-align:center;color:#fff;font-weight:850;letter-spacing:.14em;overflow:hidden}
+.preview-art img{width:100%;height:100%;object-fit:cover}
+.preview h3{font-size:clamp(25px,2.6vw,38px);letter-spacing:-.05em;line-height:1.17;margin:22px 0 5px}
+.preview p{font-size:14px;color:#557060}.preview audio{width:100%;max-width:100%;margin:15px 0}
+.reviewfiles{display:flex;flex-wrap:wrap;gap:12px;margin:12px 0 22px}.reviewfiles a{font-size:12px;font-weight:800}
+.review-status{border:1px solid #c8dbc9;border-radius:14px;background:#ecf5ef;padding:20px;margin-top:20px}
+.review-status h3{margin:0 0 8px;font-size:21px;letter-spacing:-.03em}
+.review-status p{margin:0 0 12px;font-size:14px}
+.confirm-check{display:flex;gap:12px;align-items:flex-start;font-weight:650;font-size:14px;padding:13px 0}
+.confirm-check input{width:19px;height:19px;accent-color:var(--green);margin-top:3px;flex:none}
+.status-list{display:grid;gap:10px}.status-list div{border-left:3px solid #79a68b;background:#f0f6f0;padding:13px 16px;border-radius:0 11px 11px 0;font-size:13px}
+.status-list b{display:block;color:#1a4b38;font-size:14px}
+.empty{color:#668075;font-size:14px}
+.footer-note{margin-top:25px;color:var(--muted);font-size:13px}
+@media(max-width:860px){.layout{grid-template-columns:1fr}}@media(max-width:560px){.pair,.options{grid-template-columns:1fr}.panel{padding:21px 17px}.head-actions{gap:7px}.head-actions a{display:none}h1{font-size:49px}}
+</style>
+</head>
+<body>
+<header>
+ <div class="logo">baymarin<small>CHURCH · MEDIA TEAM</small></div>
+ <div class="head-actions"><a href="/" target="_blank" rel="noopener">View website ↗</a><span id="authLabel" style="font-size:12px;color:#cde5d3">Not signed in</span><button id="signOut" type="button" hidden>Sign out</button></div>
+</header>
+<main>
+ <div class="kicker">BAYMARIN · WEEKLY TEACHING</div>
+ <h1>Media <em>Dashboard.</em></h1>
+ <p class="intro">Upload once. Listen and verify the recording. Approve it for the BayMarin website, message library and church podcast feed—without having to publish everything separately.</p>
+ <div class="steps"><span class="step active" id="step1">1. Upload</span><span class="step" id="step2">2. Review</span><span class="step" id="step3">3. Publish</span></div>
+ <section class="panel" id="loginArea"><h2>Media team sign in</h2><p>Only people approved by BayMarin can upload or approve sermons.</p><button class="btn primary" id="signIn" type="button" disabled>Sign in with Google</button><p id="authMessage" class="hint">Connecting to the BayMarin Firebase project…</p></section>
+ <div id="publisherArea" hidden>
+  <div class="layout">
+   <section class="panel">
+    <div id="newMessageArea">
+     <h2>New Sunday message</h2>
+     <form id="messageForm">
+      <div class="field"><label for="title">Sermon title *</label><input id="title" required maxlength="160" placeholder="Enter the title as it should appear"></div>
+      <div class="pair">
+       <div class="field"><label for="seriesSelect">Message series *</label><select id="seriesSelect" required><option value="">Choose a series</option><option value="__new">+ Create a new series</option></select></div>
+       <div class="field" id="newSeriesArea" hidden><label for="newSeries">New series name *</label><input id="newSeries" maxlength="120" placeholder="Name of new series"></div>
+       <div class="field"><label for="speakerSelect">Speaker *</label><select id="speakerSelect" required><option value="">Choose a speaker</option><option value="__other">+ Other / Guest speaker</option></select></div>
+       <div class="field" id="otherSpeakerArea" hidden><label for="otherSpeaker">Guest / new speaker name *</label><input id="otherSpeaker" maxlength="120" placeholder="First and last name"></div>
+       <div class="field" id="speakerTitleArea" hidden><label for="speakerTitle">Speaker title (optional)</label><input id="speakerTitle" maxlength="120" placeholder="Guest Pastor / Minister"></div>
+       <div class="field" id="speakerChurchArea" hidden><label for="speakerChurch">Guest church or organization (optional)</label><input id="speakerChurch" maxlength="160" placeholder="Church or organization"></div>
+      </div>
+      <div class="pair">
+       <div class="field"><label for="date">Sunday / message date *</label><input type="date" id="date" required></div>
+       <div class="field"><label for="confirmationEmail">Email for confirmation *</label><input type="email" id="confirmationEmail" required maxlength="200" placeholder="media@baymarin.org"></div>
+      </div>
+      <div class="field"><label for="description">Short message description *</label><textarea id="description" required maxlength="5000" placeholder="What is this message about?"></textarea></div>
+      <div class="field"><div class="group-label">Topics covered</div><div class="options" id="topics">
+       <label><input type="checkbox" name="topic" value="Prayer & Spiritual Practices">Prayer & Spiritual Practices</label><label><input type="checkbox" name="topic" value="Hope & Encouragement">Hope & Encouragement</label><label><input type="checkbox" name="topic" value="Faith & Growth">Faith & Growth</label><label><input type="checkbox" name="topic" value="Relationships & Community">Relationships & Community</label><label><input type="checkbox" name="topic" value="Identity & Purpose">Identity & Purpose</label><label><input type="checkbox" name="topic" value="Jesus & Scripture">Jesus & Scripture</label><label><input type="checkbox" name="topic" value="Advent & Christmas">Advent & Christmas</label>
+       </div><small class="hint">These categories help visitors find a message by what they are going through.</small></div>
+      <div class="field upload"><label for="audio">Sermon audio * · MP3 / M4A</label><input type="file" id="audio" accept=".mp3,.m4a" required><small class="hint">250 MB maximum. Keep your original recording; preview and listen carefully before approval.</small></div>
+      <div class="pair">
+       <div class="field upload"><label for="artwork">Sermon image / episode artwork</label><input type="file" id="artwork" accept=".jpg,.jpeg,.png,.webp"></div>
+       <div class="field upload"><label for="seriesArtwork">Series artwork</label><input type="file" id="seriesArtwork" accept=".jpg,.jpeg,.png,.webp"></div>
+      </div>
+      <div class="pair">
+       <div class="field upload"><label for="notes">Sermon notes (PDF, DOCX, TXT)</label><input type="file" id="notes" accept=".pdf,.docx,.txt"></div>
+       <div class="field upload"><label for="slides">Slide deck (PDF or PPTX)</label><input type="file" id="slides" accept=".pdf,.pptx"></div>
+      </div>
+      <div class="field upload"><label for="transcript">Corrected transcript (TXT or PDF)</label><input type="file" id="transcript" accept=".txt,.pdf"><small class="hint">Optional; reviewed TXT transcripts can power full-text search.</small></div>
+      <div class="field"><div class="group-label">Additional event / sermon photos (up to three)</div><div class="pair"><div class="upload"><input id="photo1" type="file" accept=".jpg,.jpeg,.png,.webp" aria-label="Photo one"></div><div class="upload"><input id="photo2" type="file" accept=".jpg,.jpeg,.png,.webp" aria-label="Photo two"></div></div><div class="upload" style="margin-top:10px"><input id="photo3" type="file" accept=".jpg,.jpeg,.png,.webp" aria-label="Photo three"></div></div>
+      <div class="field"><div class="group-label">Visitor permissions</div><div class="checks">
+       <label><input id="allowDownload" type="checkbox" checked>Allow visitors to download the audio</label>
+       <label><input id="allowShare" type="checkbox" checked>Show the Share button for this message</label>
+       <label><input id="shareResources" type="checkbox" checked>Show public notes and slides when attached</label>
+       <label><input id="allowTranscript" type="checkbox" checked>Show approved transcript when attached</label>
+       </div><small class="hint">Recommended: allow sharing by default. Downloads can be turned off for guest speakers or restricted material with their permission.</small></div>
+      <div class="buttons"><button class="btn light" id="previewBtn" type="button">Update preview</button><button class="btn primary" id="stageBtn" type="submit">Save Uploads for Review →</button></div>
+      <p id="notice" role="status" aria-live="polite"></p>
+     </form>
+    </div>
+    <div id="reviewArea" hidden>
+     <div class="kicker">UPLOADS SAVED · NOT PUBLIC</div><h2>Review the full message.</h2>
+     <div class="review-status"><h3>Listen before publishing</h3><p>Check that the sermon starts correctly, plays through to the end, the speaker and series are correct, and all public files are approved.</p></div>
+     <h3 id="reviewTitle">Message</h3><p id="reviewMeta" class="empty"></p>
+     <audio id="reviewAudio" controls preload="metadata" style="width:100%"></audio>
+     <p id="reviewAudioInfo" class="hint">Check the audio recording before approval.</p>
+     <div id="reviewArt" class="preview-art" style="margin:20px 0"><span>BAYMARIN CHURCH</span></div>
+     <div class="reviewfiles" id="reviewLinks"></div>
+     <label class="confirm-check"><input id="approvalCheck" type="checkbox">I have reviewed the audio, title, series, speaker, artwork, notes, slides and permissions. I approve this message for public release.</label>
+     <div class="buttons"><button class="btn primary" id="finalizeBtn" type="button" disabled>Approve & Publish Everywhere →</button><button class="btn outline" type="button" id="startAgain">Start another message</button></div>
+     <p class="hint">Once approved, the message becomes available in BayMarin's library and RSS podcast feed. Spotify must already be linked to that feed and may take time to refresh.</p>
+     <p id="reviewNotice" role="status" aria-live="polite"></p>
+    </div>
+    <div id="successArea" hidden>
+     <div class="kicker">APPROVED & PUBLISHED</div><h2>Message published.</h2>
+     <p>Your approved sermon is now available to the public library and church podcast feed. A confirmation email has been requested.</p>
+     <div class="buttons"><a class="btn primary" id="libraryLink" href="/#messages" target="_blank" rel="noopener">View in Message Library ↗</a><a class="btn light" id="feedLink" href="https://us-west1-bay-marin-church-website.cloudfunctions.net/sermonFeed" target="_blank" rel="noopener">View Podcast Feed ↗</a></div>
+     <p id="publishNote" class="hint"></p><button class="btn outline" id="addNew" type="button" style="margin-top:18px">Upload another message</button>
+    </div>
+   </section>
+   <aside>
+    <section class="panel preview">
+     <div class="kicker">PREVIEW</div>
+     <div class="preview-art" id="artPreview"><span>BAYMARIN<br>CHURCH</span></div>
+     <h3 id="titlePreview">Your message title</h3><p id="metaPreview">Speaker · Series · Date</p>
+     <p id="descriptionPreview">Your description will appear here.</p><p class="hint" id="topicPreview">Message topics appear here.</p>
+     <audio controls id="audioPreview" preload="none" hidden></audio><p class="hint" id="attachmentPreview">Notes and slides appear here when attached.</p>
+    </section>
+    <section class="panel" style="margin-top:22px"><div class="kicker">ONE UPLOAD · ONE APPROVAL</div><h2 style="margin:13px 0 22px">How it works</h2><div class="status-list">
+     <div><b>1. Upload everything</b>Audio, series, speaker, images, topics, notes and any slides.</div>
+     <div><b>2. Review privately</b>Listen to the stored recording and verify all attachments before publishing.</div>
+     <div><b>3. Approve & Publish</b>The homepage, message library and church podcast RSS update together.</div>
+     <div><b>4. Spotify refresh</b>Once BayMarin's podcast RSS is claimed and connected, Spotify imports updates on its schedule.</div>
+    </div></section>
+   </aside>
+  </div>
+ </div>
+ <p class="footer-note">BayMarin Church · Protected Media Dashboard. Sign-in and publisher approval required. Questions? info@baymarin.org</p>
+</main>
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import {getAuth,GoogleAuthProvider,signInWithPopup,signOut,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import {getFirestore,doc,getDoc} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+import {getStorage,ref,uploadBytesResumable} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js";
+const $=id=>document.getElementById(id),base="https://us-west1-bay-marin-church-website.cloudfunctions.net";
+let auth,db,storage,authorized=false,currentDraft=null,uploading=false;
+const fileTypes={mp3:"audio/mpeg",m4a:"audio/mp4",jpg:"image/jpeg",jpeg:"image/jpeg",png:"image/png",webp:"image/webp",pdf:"application/pdf",txt:"text/plain",docx:"application/vnd.openxmlformats-officedocument.wordprocessingml.document",pptx:"application/vnd.openxmlformats-officedocument.presentationml.presentation"};
+const sizes={audio:250,artwork:12,seriesArtwork:12,notes:15,slides:50,transcript:15,photo1:12,photo2:12,photo3:12};
+const prefixes={audio:"message",artwork:"artwork",seriesArtwork:"seriesArtwork",notes:"notes",slides:"slides",transcript:"transcript",photo1:"photo1",photo2:"photo2",photo3:"photo3"};
+const extensions={audio:["mp3","m4a"],artwork:["jpg","jpeg","png","webp"],seriesArtwork:["jpg","jpeg","png","webp"],notes:["pdf","docx","txt"],slides:["pdf","pptx"],transcript:["pdf","txt"],photo1:["jpg","jpeg","png","webp"],photo2:["jpg","jpeg","png","webp"],photo3:["jpg","jpeg","png","webp"]};
+const objectURLs={audio:null,artwork:null};
+function label(t,target="notice"){$(target).textContent=t;}
+function series(){return $("seriesSelect").value==="__new"?$("newSeries").value.trim():$("seriesSelect").value.trim();}
+function speaker(){return $("speakerSelect").value==="__other"?$("otherSpeaker").value.trim():$("speakerSelect").value.trim();}
+function formData(){return {title:$("title").value.trim(),series:series(),speaker:speaker(),speakerTitle:$("speakerTitle").value.trim(),speakerChurch:$("speakerChurch").value.trim(),description:$("description").value.trim(),date:$("date").value,confirmationEmail:$("confirmationEmail").value.trim(),topics:[...document.querySelectorAll('input[name="topic"]:checked')].map(x=>x.value),allowDownload:$("allowDownload").checked,allowShare:$("allowShare").checked,shareResources:$("shareResources").checked,allowTranscript:$("allowTranscript").checked};}
+function conditional(){
+ const newSeries=$("seriesSelect").value==="__new",other=$("speakerSelect").value==="__other";
+ $("newSeriesArea").hidden=!newSeries;$("newSeries").required=newSeries;
+ for(const id of ["otherSpeakerArea","speakerTitleArea","speakerChurchArea"])$(id).hidden=!other;
+ $("otherSpeaker").required=other;
+ preview();
+}
+$("seriesSelect").addEventListener("change",conditional);
+$("speakerSelect").addEventListener("change",conditional);
+function fillSelect(id,names,extra){
+ const select=$(id);let first=select.options[0].textContent;
+ select.replaceChildren(new Option(first,""));
+ for(const name of names)select.add(new Option(name,name));
+ select.add(new Option(extra.label,extra.value));
+}
+async function loadCatalog(){
+ try{
+ const response=await fetch("/assets/baymarin-messages-catalog.json",{cache:"no-cache"});
+ if(!response.ok)throw Error("Archive not available");const d=await response.json();
+ const messages=Array.isArray(d.messages)?d.messages:[];
+ const series=[...new Set(messages.map(m=>m.series).filter(x=>x&&x!=="Individual Messages"))].sort((a,b)=>a.localeCompare(b));
+ const speakers=[...new Set(messages.map(m=>m.speaker).filter(x=>x&&x!=="BayMarin"))].sort((a,b)=>a.localeCompare(b));
+ fillSelect("seriesSelect",series,{label:"+ Create a new series",value:"__new"});
+ fillSelect("speakerSelect",speakers,{label:"+ Other / Guest speaker",value:"__other"});
+ }catch(e){fillSelect("seriesSelect",["Sunday Teaching","Prayer"],{label:"+ Create a new series",value:"__new"});fillSelect("speakerSelect",["Dave Robinson","Barry Brown"],{label:"+ Other / Guest speaker",value:"__other"});}
+}
+function preview(){
+ const d=formData();
+ $("titlePreview").textContent=d.title||"Your message title";
+ $("metaPreview").textContent=[d.speaker||"Speaker",d.series||"Series",d.date||"Date"].join(" · ");
+ $("descriptionPreview").textContent=d.description||"Your description will appear here.";
+ $("topicPreview").textContent=d.topics.length?"Topics: "+d.topics.join(" · "):"No topics selected.";
+ $("attachmentPreview").textContent=["notes","slides","transcript","seriesArtwork","photo1","photo2","photo3"].filter(id=>$(id).files[0]).map(id=>id+": "+$(id).files[0].name).join(" · ")||"No supporting files selected.";
+ for(const type of ["audio","artwork"]){
+ const file=$(type).files[0];
+ if(objectURLs[type]){URL.revokeObjectURL(objectURLs[type]);objectURLs[type]=null;}
+ if(file){
+  objectURLs[type]=URL.createObjectURL(file);
+  if(type==="audio"){$("audioPreview").src=objectURLs[type];$("audioPreview").hidden=false;}
+  else{const image=document.createElement("img");image.src=objectURLs[type];image.alt="Sermon artwork preview";$("artPreview").replaceChildren(image);}
+ }else if(type==="audio"){$("audioPreview").hidden=true;$("audioPreview").removeAttribute("src");}
+ }
+}
+$("previewBtn").onclick=preview;
+$("messageForm").addEventListener("input",e=>{if(e.target.type!=="file")previewTextOnly();});
+function previewTextOnly(){
+ const d=formData();$("titlePreview").textContent=d.title||"Your message title";$("metaPreview").textContent=[d.speaker||"Speaker",d.series||"Series",d.date||"Date"].join(" · ");$("descriptionPreview").textContent=d.description||"Your description will appear here.";$("topicPreview").textContent=d.topics.join(" · ")||"No topics selected.";
+}
+$("messageForm").addEventListener("change",e=>{if(e.target.type==="file")preview();});
+$("date").value=new Date().toLocaleDateString("en-CA",{timeZone:"America/Los_Angeles"});
+async function apiRequest(endpoint,method,body){
+ const token=await auth.currentUser.getIdToken();
+ const init={method,headers:{"Authorization":"Bearer "+token}};
+ if(body){init.headers["Content-Type"]="application/json";init.body=JSON.stringify(body);}
+ const response=await fetch(base+"/"+endpoint,init);
+ let payload={};try{payload=await response.json();}catch(_){}
+ if(!response.ok||!payload.ok)throw Error(payload.message||"Server connection failed ("+response.status+")");
+ return payload;
+}
+async function initialize(){
+ try{
+  await loadCatalog();
+  const response=await fetch("/__/firebase/init.json",{cache:"no-store"});
+  if(!response.ok)throw Error("Firebase configuration unavailable");
+  const config=await response.json();if(!config.apiKey||!config.storageBucket||!config.projectId)throw Error("Firebase project configuration incomplete");
+  const app=initializeApp(config);auth=getAuth(app);db=getFirestore(app);storage=getStorage(app);
+  $("signIn").disabled=false;$("authMessage").textContent="Sign in with a Google account approved by BayMarin.";
+  $("signIn").onclick=async()=>{try{await signInWithPopup(auth,new GoogleAuthProvider())}catch(e){$("authMessage").textContent=e.message;}};
+  $("signOut").onclick=()=>signOut(auth);
+  onAuthStateChanged(auth,async user=>{
+   authorized=false;$("publisherArea").hidden=true;$("loginArea").hidden=false;$("signOut").hidden=!user;
+   $("authLabel").textContent=user?"Verifying access…":"Not signed in";
+   if(!user)return;
+   try{
+    const grant=await getDoc(doc(db,"media_publishers",user.uid));
+    authorized=grant.exists()&&grant.data().active===true;
+    if(!authorized){$("authLabel").textContent="Approval required";$("authMessage").textContent="Your Google sign-in worked, but the church administrator must grant media publisher access.";return;}
+    $("authLabel").textContent="Approved media team";
+    $("confirmationEmail").value=$("confirmationEmail").value||user.email||"";
+    $("publisherArea").hidden=false;$("loginArea").hidden=true;
+    const pending=new URLSearchParams(location.search).get("draft");
+    if(pending)await openDraft(pending);
+   }catch(e){$("authMessage").textContent="Could not verify permission: "+e.message;}
+  });
+ }catch(e){$("authMessage").textContent="Dashboard requires Firebase setup: "+e.message;}
+}
+initialize();
+function upload(file,path){
+ return new Promise((resolve,reject)=>{
+  const extension=path.split(".").pop().toLowerCase();
+  const task=uploadBytesResumable(ref(storage,path),file,{contentType:fileTypes[extension]||file.type});
+  task.on("state_changed",s=>label("Uploading "+file.name+" · "+Math.round(s.bytesTransferred/s.totalBytes*100)+"%"),
+   reject,()=>resolve());
+ });
+}
+async function stage(event){
+ event.preventDefault();if(uploading||!authorized||!auth?.currentUser)return label("Sign in as an approved publisher before uploading.");
+ if(!$("messageForm").reportValidity())return;
+ const d=formData(),id=crypto.randomUUID(),uid=auth.currentUser.uid,folder="sermons/"+uid+"/"+id+"/";
+ if(!d.title||!d.series||!d.speaker||!d.date||!d.description||!d.confirmationEmail)return label("Complete all required fields.");
+ const data={...d,id};
+ for(const [name,max] of Object.entries(sizes)){
+  const file=$(name).files[0];if(!file){if(name==="audio")return label("Choose an MP3 or M4A recording.");data[name+"Path"]="";continue;}
+  const ext=file.name.split(".").pop().toLowerCase();
+  if(!extensions[name].includes(ext)||file.size>max*1024*1024||file.size<1024)return label(name+" is invalid; check the format and "+max+" MB limit.");
+ }
+ uploading=true;$("stageBtn").disabled=true;
+ try{
+  for(const name of Object.keys(sizes)){
+   const file=$(name).files[0];if(!file)continue;
+   const ext=file.name.split(".").pop().toLowerCase();const path=folder+prefixes[name]+"."+ext;
+   data[name+"Path"]=path;await upload(file,path);
+  }
+  const transcript=$("transcript").files[0];
+  if(d.allowTranscript&&transcript?.name.toLowerCase().endsWith(".txt"))data.transcriptText=(await transcript.text()).slice(0,80000);
+  label("Upload complete. Saving private review draft…");
+  const result=await apiRequest("stageMessage","POST",data);
+  currentDraft=id;
+  history.replaceState(null,"","/media/?draft="+encodeURIComponent(id));
+  await openDraft(id);
+  label("");
+  if(!result.emailSent)label("Draft saved. Confirmation email could not be verified; your private review is available here.","reviewNotice");
+ }catch(e){label("Upload was not submitted: "+e.message+". If files were uploaded, contact the administrator before retrying to avoid duplicate uploads.");}
+ finally{uploading=false;$("stageBtn").disabled=false;}
+}
+$("messageForm").onsubmit=stage;
+async function openDraft(id){
+ if(!authorized)return;
+ try{
+  const result=await apiRequest("reviewMessage?id="+encodeURIComponent(id),"GET");
+  const m=result.message;currentDraft=id;
+  if(m.reviewStatus==="published")return showPublished(m);
+  if(m.reviewStatus!=="pending_review")throw Error("Draft is not awaiting approval");
+  $("newMessageArea").hidden=true;$("reviewArea").hidden=false;$("successArea").hidden=true;
+  $("step1").classList.remove("active");$("step2").classList.add("active");
+  $("reviewTitle").textContent=m.title;$("reviewMeta").textContent=[m.speaker,m.speakerTitle,m.speakerChurch,m.series,m.date].filter(Boolean).join(" · ");
+  $("reviewAudio").src=m.audioUrl;$("reviewAudio").load();
+  $("reviewAudioInfo").textContent="Stored audio · "+(m.audioBytes/1024/1024).toFixed(1)+" MB. Listen carefully before approving.";
+  $("reviewLinks").replaceChildren();
+  for(const [url,title] of [[m.notesUrl,"Sermon notes"],[m.slidesUrl,"Slide deck"],[m.transcriptUrl,"Transcript"],[m.seriesArtworkUrl,"Series artwork"]]){
+   if(!url)continue;const a=document.createElement("a");a.href=url;a.target="_blank";a.rel="noopener noreferrer";a.textContent="View "+title+" ↗";$("reviewLinks").append(a);
+  }
+  $("reviewArt").replaceChildren();if(m.artworkUrl||m.seriesArtworkUrl){const image=document.createElement("img");image.src=m.artworkUrl||m.seriesArtworkUrl;image.alt="Approved message artwork";$("reviewArt").append(image);}else $("reviewArt").textContent="BAYMARIN CHURCH";
+  $("approvalCheck").checked=false;$("finalizeBtn").disabled=true;
+  $("reviewNotice").textContent="Draft saved. This message is NOT public yet. Review and approve when ready.";
+ }catch(e){label("Could not open your draft: "+e.message,"reviewNotice");}
+}
+$("approvalCheck").onchange=()=>$("finalizeBtn").disabled=!$("approvalCheck").checked;
+$("finalizeBtn").onclick=async()=>{
+ if(!currentDraft||!$("approvalCheck").checked||!authorized)return;
+ $("finalizeBtn").disabled=true;$("reviewNotice").textContent="Publishing approved message…";
+ try{
+  const result=await apiRequest("finalizeMessage","POST",{id:currentDraft,approved:true});
+  showPublished({id:currentDraft,title:$("reviewTitle").textContent});
+  $("libraryLink").href=result.libraryUrl;
+  $("publishNote").textContent=(result.emailSent?"A confirmation email was sent.":"The confirmation email was not confirmed. ")+" Podcast feed updated; Spotify will refresh when connected.";
+  history.replaceState(null,"","/media/");
+ }catch(e){$("reviewNotice").textContent="Could not finalize: "+e.message;$("finalizeBtn").disabled=false;}
+};
+function showPublished(m){
+ $("newMessageArea").hidden=true;$("reviewArea").hidden=true;$("successArea").hidden=false;
+ for(const id of ["step1","step2"])$(id).classList.remove("active");$("step3").classList.add("active");
+ $("libraryLink").href="/?message="+encodeURIComponent(m.id)+"#messages";
+}
+function reset(){
+ currentDraft=null;history.replaceState(null,"","/media/");
+ $("messageForm").reset();$("confirmationEmail").value=auth?.currentUser?.email||"";
+ $("newMessageArea").hidden=false;$("reviewArea").hidden=true;$("successArea").hidden=true;
+ $("step1").classList.add("active");for(const id of ["step2","step3"])$(id).classList.remove("active");
+ $("artPreview").textContent="BAYMARIN CHURCH";$("audioPreview").hidden=true;conditional();label("");
+}
+$("startAgain").onclick=reset;$("addNew").onclick=reset;
+</script>
+</body></html>

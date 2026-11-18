@@ -397,8 +397,10 @@ exports.stageMessage=onRequest({region:"us-west1",cors:MEDIA_ORIGINS,invoker:"pu
   };
   const doc=getFirestore().collection("sermons").doc(id);
   // Creating is atomic; a repeated request cannot overwrite a previously approved sermon.
-  await doc.create(record);
-  await getFirestore().collection("media_receipts").doc(id).create({ownerUid:user.uid,email,createdAt:FieldValue.serverTimestamp()});
+  const batch=getFirestore().batch();
+  batch.create(doc,record);
+  batch.create(getFirestore().collection("media_receipts").doc(id),{ownerUid:user.uid,email,createdAt:FieldValue.serverTimestamp()});
+  await batch.commit();
   const emailed=await mediaReceipt(email,record,"review");
   return res.status(201).json({ok:true,id,reviewStatus:"pending_review",emailSent:emailed,reviewUrl:MEDIA_SITE+"/media/?draft="+encodeURIComponent(id)});
  }catch(e){

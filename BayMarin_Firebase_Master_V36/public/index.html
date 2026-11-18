@@ -216,19 +216,19 @@
 @media(prefers-reduced-motion:reduce){#homepage .bm-story-visual .bm-story-frame{animation:none;opacity:0;transform:none}#homepage .bm-story-visual .bm-story-frame-one{opacity:1}#homepage .bm-story-orbit svg{animation:none}}
 </style><style id="baymarin-sanctuary-header-layout">
 /* Refined Sanctuary-inspired header with BayMarin destinations and colors. */
-body>.nav#nav,body>.nav#nav.page-nav{position:relative!important;top:auto!important;left:auto!important;right:auto!important;z-index:45;width:100%;height:116px;padding:0 clamp(24px,3vw,62px);display:flex;align-items:center;justify-content:space-between;gap:clamp(18px,2vw,40px);background:#0d0e0e!important;color:#fff;box-shadow:none}
+body>.nav#nav,body>.nav#nav.page-nav{position:relative!important;top:auto!important;left:auto!important;right:auto!important;z-index:45;width:100%;height:116px;padding:0 clamp(24px,3vw,62px);display:flex;align-items:center;justify-content:space-between;gap:clamp(18px,2vw,40px);background:#80b3a5!important;color:#173d36;box-shadow:none}
 body>.nav#nav>.wordmark{flex:0 0 auto;font-size:clamp(28px,2.4vw,37px);font-weight:800;line-height:.8;white-space:nowrap}
 body>.nav#nav>.wordmark span{font-size:10px;letter-spacing:.29em;margin-top:12px}
 body>.nav#nav .navright{flex:1;display:flex;align-items:center;justify-content:flex-end;gap:clamp(10px,1.5vw,28px);min-width:0;height:100%}
 body>.nav#nav .desktopnav{display:flex;align-items:center;justify-content:center;gap:clamp(18px,2.2vw,40px);flex:1;min-width:0;font-size:clamp(12px,.95vw,16px);font-weight:700;letter-spacing:.025em}
 body>.nav#nav .desktopnav>a,body>.nav#nav .desktopnav>.bm-navdrop{height:48px;min-height:48px;display:inline-flex;align-items:center;justify-content:center;line-height:1.15;flex:0 0 auto}
-body>.nav#nav .desktopnav>.bm-navdrop .bm-navdrop-toggle{height:48px;min-height:48px;padding:0;display:inline-flex;align-items:center;line-height:1.15;color:#fff}
-body>.nav#nav .bm-navdrop-links{top:calc(100% + 7px);background:#80b3a5}
+body>.nav#nav .desktopnav>.bm-navdrop .bm-navdrop-toggle{height:48px;min-height:48px;padding:0;display:inline-flex;align-items:center;line-height:1.15;color:#173d36}
+body>.nav#nav .bm-navdrop-links{top:calc(100% + 7px);background:#dbeae1}
 body>.nav#nav .bm-header-actions{display:flex;align-items:center;gap:12px;flex:0 0 auto}
-body>.nav#nav .bm-header-pill{height:48px;min-width:92px;border:1.5px solid #fff;border-radius:999px;padding:0 23px;display:inline-flex;align-items:center;justify-content:center;color:#fff;background:transparent;font-weight:700;font-size:13px;letter-spacing:.025em;cursor:pointer;white-space:nowrap;transition:background .2s,color .2s}
-body>.nav#nav .bm-header-pill:hover,body>.nav#nav .bm-header-pill:focus-visible{background:#fff;color:#173e32;text-decoration:none}
-body>.nav#nav .menu-btn{display:none;width:58px;height:58px;flex:0 0 auto;background:transparent;border:1px solid #ffffff8c;box-shadow:none;color:#fff}
-body>.nav#nav .menu-btn:hover{background:#ffffff1c}
+body>.nav#nav .bm-header-pill{height:48px;min-width:92px;border:1.5px solid #173d36;border-radius:999px;padding:0 23px;display:inline-flex;align-items:center;justify-content:center;color:#173d36;background:transparent;font-weight:700;font-size:13px;letter-spacing:.025em;cursor:pointer;white-space:nowrap;transition:background .2s,color .2s}
+body>.nav#nav .bm-header-pill:hover,body>.nav#nav .bm-header-pill:focus-visible{background:#173d36;color:#fff;text-decoration:none}
+body>.nav#nav .menu-btn{display:none;width:58px;height:58px;flex:0 0 auto;background:transparent;border:1px solid #173d368c;box-shadow:none;color:#173d36}
+body>.nav#nav .menu-btn:hover{background:#ffffff55}
 #homepage>.hero{border-radius:0 0 48px 48px}
 @media(max-width:1270px){
  body>.nav#nav{height:100px;padding:0 26px;gap:20px}
@@ -250,6 +250,14 @@ body>.nav#nav .menu-btn:hover{background:#ffffff1c}
  body>.nav#nav .menu-btn{width:51px;height:51px}
  #homepage>.hero{border-radius:0 0 30px 30px}
 }
+
+/* Ensure consistent sage-green header colors and readable dropdown interactions. */
+body>.nav#nav .desktopnav>a{color:#173d36}
+body>.nav#nav .desktopnav>a:hover,body>.nav#nav .desktopnav>a:focus-visible,
+body>.nav#nav .bm-navdrop-toggle:hover,body>.nav#nav .bm-navdrop-toggle:focus-visible{color:#0a3028;text-decoration:underline;text-underline-offset:7px}
+body>.nav#nav .bm-navdrop-links a{color:#173d36}
+body>.nav#nav .bm-navdrop-links a:hover,body>.nav#nav .bm-navdrop-links a:focus-visible{background:#f5faf5;color:#10392f}
+body>.nav#nav .bm-header-pill:focus-visible,body>.nav#nav .menu-btn:focus-visible{outline:3px solid #173d36;outline-offset:3px}
 </style></head><body><div class="topline">SUNDAYS AT 10:00 AM · GUZMAN HALL · SAN RAFAEL</div><header class="nav" id="nav"><a aria-label="BayMarin Home" class="wordmark" data-baymarin-target="home" role="button" tabindex="0">baymarin<span>CHURCH</span></a><div class="navright"><nav aria-label="Primary" class="desktopnav"><div class="bm-navdrop"><button type="button" class="bm-navdrop-toggle" aria-expanded="false">I'M NEW HERE <span>⌄</span></button><div class="bm-navdrop-links"><a data-baymarin-target="new" role="button" tabindex="0">Sundays</a><a data-baymarin-target="starting-point" role="button" tabindex="0">Starting Point</a><a data-baymarin-target="membership" role="button" tabindex="0">Membership Matters</a><a data-baymarin-target="about" role="button" tabindex="0">About Us</a></div></div><a data-baymarin-target="grow" role="button" tabindex="0">GROW</a><a data-baymarin-target="serve" role="button" tabindex="0">SERVE</a><a data-baymarin-target="resources" role="button" tabindex="0">RESOURCES</a></nav><div class="bm-header-actions"><a class="bm-header-pill" data-baymarin-target="give" role="button" tabindex="0">GIVE</a><a class="bm-header-pill" data-baymarin-target="new" role="button" tabindex="0">JOIN US</a></div><button aria-controls="menu" aria-expanded="false" aria-label="Open menu" class="menu-btn" id="menuBtn"><i></i></button></div></header>
 <div aria-label="BayMarin navigation" aria-modal="true" class="overlay" id="menu" role="dialog"><div class="overlay-top"><a aria-label="BayMarin home" class="wordmark" data-baymarin-target="home" role="button" tabindex="0">baymarin<span>CHURCH</span></a><button aria-label="Close menu" class="close" id="closeMenu">×</button></div><div class="menu-grid">
 <div class="menu-group"><button aria-expanded="false" class="accordion-trigger" type="button">I'm New Here<span aria-hidden="true">⌄</span></button><div class="accordion-links"><a data-baymarin-target="new" role="button" tabindex="0">Sundays</a><a data-baymarin-target="starting-point" role="button" tabindex="0">Starting Point</a><a data-baymarin-target="membership" role="button" tabindex="0">Membership Matters</a><a data-baymarin-target="about" role="button" tabindex="0">About Us</a></div></div>

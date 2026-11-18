@@ -270,69 +270,10 @@ exports.latestMessage=onRequest({region:"us-west1",cors:MEDIA_ORIGINS,invoker:"p
  try{const messages=await findPublishedMessages(30);res.set("Cache-Control","public,max-age=120,s-maxage=120").json({ok:true,messages});}
  catch(e){console.error("Messages query error",e?.name);bad(res,503,"Message library unavailable");}
 });
-exports.publishMessage=onRequest({region:"us-west1",cors:MEDIA_ORIGINS,invoker:"public",maxInstances:3,timeoutSeconds:45},async(req,res)=>{
+// Keep the legacy endpoint name for compatibility, but prevent unreviewed direct publishing.
+exports.publishMessage=onRequest({region:"us-west1",cors:MEDIA_ORIGINS,invoker:"public",maxInstances:2},async(req,res)=>{
  res.set("Cache-Control","no-store");
- if(req.method!=="POST")return bad(res,405,"Method not allowed");
- try{
-  const authorization=req.get("authorization")||"";
-  if(!authorization.startsWith("Bearer "))return bad(res,401,"Sign in required");
-  const user=await getAuth().verifyIdToken(authorization.slice(7),true);
-  const grant=await getFirestore().collection("media_publishers").doc(user.uid).get();
-  if(!grant.exists||grant.data().active!==true)return bad(res,403,"Publisher approval required");
-  const d=req.body;
-  if(!d||typeof d!=="object")return bad(res,400,"Invalid request");
-  for(const [key,max] of [["title",160],["series",120],["speaker",120],["description",5000]])
-   if(typeof d[key]!=="string"||!d[key].trim()||d[key].trim().length>max)return bad(res,400,"Invalid "+key);
-  const day=String(d.date||"");
-  if(!/^\d{4}-\d{2}-\d{2}$/.test(day)||Number.isNaN(Date.parse(day)))return bad(res,400,"Invalid sermon date");
-  const id=String(d.id||"");
-  if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id))return bad(res,400,"Invalid ID");
-  const folder="sermons/"+user.uid+"/"+id+"/";
-  const audioPath=String(d.audioPath||""),artworkPath=String(d.artworkPath||"");
-  const notesPath=String(d.notesPath||""),slidesPath=String(d.slidesPath||""),transcriptPath=String(d.transcriptPath||"");
-  if(!audioPath.startsWith(folder)||!/^message\.(mp3|m4a)$/i.test(audioPath.slice(folder.length)))return bad(res,400,"Invalid audio path");
-  if(artworkPath&&(!artworkPath.startsWith(folder)||!/^artwork\.(jpg|jpeg|png|webp)$/i.test(artworkPath.slice(folder.length))))return bad(res,400,"Invalid artwork path");
-  if(notesPath&&(!notesPath.startsWith(folder)||!/^notes\.(pdf|docx|txt)$/i.test(notesPath.slice(folder.length))))return bad(res,400,"Invalid notes path");
-  if(slidesPath&&(!slidesPath.startsWith(folder)||!/^slides\.(pdf|pptx)$/i.test(slidesPath.slice(folder.length))))return bad(res,400,"Invalid slides path");
-  if(transcriptPath&&(!transcriptPath.startsWith(folder)||!/^transcript\.(pdf|txt)$/i.test(transcriptPath.slice(folder.length))))return bad(res,400,"Invalid transcript path");
-  const bucket=getStorage().bucket(),audio=bucket.file(audioPath);
-  const [hasAudio]=await audio.exists();if(!hasAudio)return bad(res,400,"Audio wasn't uploaded");
-  const [meta]=await audio.getMetadata();
-  const audioBytes=Number(meta.size||0);
-  if(!audioBytes||audioBytes>262144000||!String(meta.contentType||"").startsWith("audio/"))return bad(res,400,"Invalid audio");
-  let artworkUrl="";
-  if(artworkPath){
-   const artwork=bucket.file(artworkPath),[exists]=await artwork.exists();
-   if(!exists)return bad(res,400,"Artwork wasn't uploaded");
-   const [artMeta]=await artwork.getMetadata();
-   if(Number(artMeta.size)>12582912||!String(artMeta.contentType||"").startsWith("image/"))return bad(res,400,"Invalid artwork");
-   artworkUrl=await getDownloadURL(artwork);
-  }
-  async function resource(path,maxBytes,allowedTypes){
-    if(!path)return "";
-    const file=bucket.file(path),[exists]=await file.exists();
-    if(!exists)throw Error("Attachment not uploaded");
-    const [details]=await file.getMetadata();
-    if(!Number(details.size)||Number(details.size)>maxBytes||!allowedTypes.includes(details.contentType))throw Error("Invalid attachment");
-    return getDownloadURL(file);
-  }
-  const notesUrl=await resource(notesPath,15728640,["application/pdf","application/vnd.openxmlformats-officedocument.wordprocessingml.document","text/plain"]);
-  const slidesUrl=await resource(slidesPath,52428800,["application/pdf","application/vnd.openxmlformats-officedocument.presentationml.presentation"]);
-  const transcriptUrl=await resource(transcriptPath,15728640,["application/pdf","text/plain"]);
-  const topics=Array.isArray(d.topics)?[...new Set(d.topics.map(v=>string(v,80)).filter(Boolean))].slice(0,8):[];
-  const transcriptText=(d.allowTranscript===true&&transcriptPath.endsWith(".txt"))?string(d.transcriptText,80000):"";
-  const audioUrl=await getDownloadURL(audio);
-  const record={title:d.title.trim(),series:d.series.trim(),speaker:d.speaker.trim(),topics,
-   date:day,description:d.description.trim(),published:true,createdAt:FieldValue.serverTimestamp(),
-   authorUid:user.uid,audioPath,artworkPath,notesPath,slidesPath,transcriptPath,
-   notesUrl:d.shareResources===true?notesUrl:"",slidesUrl:d.shareResources===true?slidesUrl:"",
-   transcriptUrl:d.allowTranscript===true?transcriptUrl:"",transcriptText,allowDownload:d.allowDownload===true,
-   audioUrl,artworkUrl,audioBytes,audioType:meta.contentType||"audio/mpeg"};
-  const doc=getFirestore().collection("sermons").doc(id);
-  if((await doc.get()).exists)return bad(res,409,"Already published");
-  await doc.create(record);
-  res.status(201).json({ok:true,id});
- }catch(e){console.error("Sermon publish failed",e?.name);bad(res,503,"Publish failed. Check permissions and storage setup.");}
+ return bad(res,410,"Direct publishing has been replaced. Use the /media/ dashboard to upload, review and approve messages.");
 });
 exports.sermonFeed=onRequest({region:"us-west1",cors:false,invoker:"public",maxInstances:3},async(req,res)=>{
  if(req.method!=="GET")return res.status(405).send("Method not allowed");

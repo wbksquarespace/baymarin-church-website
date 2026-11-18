@@ -155,7 +155,7 @@ exports.submitForm=onRequest({region:"us-west1",cors:["https://bay-marin-church-
        if(stages.length){
          const id=crypto.randomUUID();
          await getFirestore().collection(EVENT_COLLECTION).doc(id).set({
-           name:string(data.first,80),email:string(data.email,200),visitDate,
+           id,name:string(data.first,80),email:string(data.email,200),visitDate,
            visitAt:Timestamp.fromDate(visitAt),reminderStage:stages[0].stage,
            nextReminderAt:Timestamp.fromDate(stages[0].at),createdAt:Timestamp.now(),
            attempts:0,remindersOptedIn:true
@@ -175,13 +175,14 @@ function reminderMessage(record,stage){
  const when=stage==="before"?"in two days":"this morning";
  const subject=stage==="before"?"Your Sunday visit is coming up — BayMarin Church":"We're looking forward to seeing you today — BayMarin";
  const after=stage==="after";
+ const stopUrl=record.id?"https://us-west1-bay-marin-church-website.cloudfunctions.net/stopVisitReminders?token="+encodeURIComponent(record.id):"";
  const title=after?"Thanks for connecting with BayMarin!":stage==="before"?"Sunday is almost here.":"Welcome to Sunday at BayMarin!";
  const message=after
   ?["Hi "+short+", we hope your weekend went well.","Whether you were able to visit or your plans changed, we'd love to help you find your next step. Have a question or want to connect? Just reply to this email."]
   :["Hi "+short+", a friendly reminder that your BayMarin visit is "+when+".","We gather at 10:00 AM at "+VISIT_ADDRESS+". There's room for you, and we're glad you're considering joining us.","Need to change your plans or stop reminders? Reply to this email and let us know."];
  return {from:mailFrom.value(),to:[record.email],reply_to:STAFF_EMAIL,subject:after?"A note from BayMarin after Sunday":subject,
   text:message.join("\n\n")+"\n\nBayMarin Church\ninfo@baymarin.org",
-  html:brandedEmail(title,after?"STAY CONNECTED":"PLAN YOUR VISIT",message,after?"EXPLORE WAYS TO CONNECT":"GET DIRECTIONS",after?"https://baymarin.churchcenter.com/home":VISIT_MAP)
+  html:brandedEmail(title,after?"STAY CONNECTED":"PLAN YOUR VISIT",message,after?"EXPLORE WAYS TO CONNECT":"GET DIRECTIONS",after?"https://baymarin.churchcenter.com/home":VISIT_MAP)+(stopUrl?'<p style="text-align:center;font:13px Arial,sans-serif;color:#315f4c;padding:14px"><a href="'+escapeHtml(stopUrl)+'" style="color:#315f4c">Stop visit reminders</a></p>':'')
  };
 }
 exports.sendVisitReminders=onSchedule({schedule:"every 30 minutes",timeZone:VISIT_TIMEZONE,region:"us-west1",secrets:[mailKey,mailFrom],maxInstances:1,timeoutSeconds:120},async()=>{
@@ -218,4 +219,17 @@ exports.sendVisitReminders=onSchedule({schedule:"every 30 minutes",timeZone:VISI
    }
   }catch(err){console.error("Reminder send retry needed",snap.id,err?.message);}
  }
+});
+
+exports.stopVisitReminders=onRequest({region:"us-west1",cors:false,invoker:"public",maxInstances:2},async(req,res)=>{
+ res.set("Cache-Control","no-store");
+ if(req.method!=="GET")return res.status(405).send("Method not allowed");
+ const token=string(req.query.token,80);
+ if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(token)){
+   return res.status(400).send("Invalid reminder link.");
+ }
+ try{
+   await getFirestore().collection(EVENT_COLLECTION).doc(token).delete();
+   res.status(200).type("html").send('<!doctype html><html><meta name="viewport" content="width=device-width,initial-scale=1"><title>BayMarin reminders</title><body style="background:#edf3ee;font:18px/1.6 Arial,sans-serif;color:#173e32;margin:0;padding:50px 22px"><main style="max-width:520px;padding:40px;margin:50px auto;background:#fff;border-radius:24px"><h1>BayMarin</h1><h2>Your visit reminders are off.</h2><p>We will not send any more automated visit reminders for this request. You are always welcome to join us or reach out with questions.</p><a href="https://bay-marin-church-website.web.app" style="color:#173e32">Back to BayMarin</a></main></body></html>');
+ }catch(err){console.error("Reminder opt-out failed",err?.name||"unknown");res.status(503).send("Unable to update preferences. Please contact info@baymarin.org.");}
 });

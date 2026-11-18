@@ -247,6 +247,16 @@ async function findPublishedMessages(max){
  const snapshot=await getFirestore().collection("sermons").where("published","==",true).orderBy("date","desc").limit(max).get();
  return snapshot.docs.map(doc=>({id:doc.id,...doc.data(),createdAt:undefined}));
 }
+// Safe readiness probe: confirms the deployed API can reach the sermon database.
+// It intentionally never exposes publisher identities, secrets or stored records.
+exports.sermonHealth=onRequest({region:"us-west1",cors:MEDIA_ORIGINS,invoker:"public",maxInstances:2},async(req,res)=>{
+ res.set("Cache-Control","no-store");
+ if(req.method!=="GET")return bad(res,405,"Method not allowed");
+ try{
+  await getFirestore().collection("sermons").limit(1).get();
+  return res.status(200).json({ok:true,service:"baymarin-sermon-publisher",database:"reachable"});
+ }catch(e){console.error("Sermon health failed",e?.name);return res.status(503).json({ok:false,service:"baymarin-sermon-publisher",database:"unavailable"});}
+});
 exports.latestMessage=onRequest({region:"us-west1",cors:MEDIA_ORIGINS,invoker:"public",maxInstances:3},async(req,res)=>{
  if(req.method!=="GET")return bad(res,405,"Method not allowed");
  try{const messages=await findPublishedMessages(30);res.set("Cache-Control","public,max-age=120,s-maxage=120").json({ok:true,messages});}

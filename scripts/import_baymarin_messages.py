@@ -75,18 +75,22 @@ for i,a in enumerate(anchors):
   if len(strings)>=12:break
  date_idx=next((j for j,t in enumerate(strings) if date_re.search(t)),None)
  if date_idx is None:
-  print('SKIPPED',i,strings[:5]);continue
- titleline=strings[date_idx]
- # speakers are often the immediately preceding element, closest to link
- speaker=' · '.join(strings[:date_idx]) if date_idx>0 else ''
+  # The 2022 archive contains several titled recordings without a published date.
+  # Keep them searchable by title and speaker, but never invent a calendar date.
+  if len(strings)<2 or strings[1]=='Minimal Mode Player Structure':
+   print('SKIPPED',i,strings[:5]);continue
+  titleline=strings[1];speaker=strings[0];label=titleline;title=titleline;date='';yr=current_year
+ else:
+  titleline=strings[date_idx]
+  # speakers are often the immediately preceding element, closest to link
+  speaker=' · '.join(strings[:date_idx]) if date_idx>0 else ''
+  label=titleline
+  match=date_re.search(label)
+  title=label[match.end():].strip(' -–—:;,') if match else label
+  if not title:title=label
+  date,yr=parse_date(label,current_year)
  speaker=norm(speaker)[:120]
  speaker=re.sub(r'^(?:Download|Listen)\s*','',speaker,flags=re.I)
- label=titleline
- match=date_re.search(label)
- title=label[match.end():].strip(' -–—:;,') if match else label
- if not title:title=label
- if titleline.strip().startswith('Easter Sunday'):title=title or 'Easter Sunday'
- date,yr=parse_date(label,current_year)
  if date and prev_date and date>prev_date and (datetime.date.fromisoformat(date)-datetime.date.fromisoformat(prev_date)).days>150 and '/2' not in label[:3]:
   # old pages omit year after 2026; falling back to chronological year decrement
   if not re.search(r'\d{1,2}/\d{1,2}/\d{2,4}',label):

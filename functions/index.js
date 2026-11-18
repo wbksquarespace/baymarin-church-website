@@ -320,12 +320,13 @@ exports.publishMessage=onRequest({region:"us-west1",cors:MEDIA_ORIGINS,invoker:"
   const slidesUrl=await resource(slidesPath,52428800,["application/pdf","application/vnd.openxmlformats-officedocument.presentationml.presentation"]);
   const transcriptUrl=await resource(transcriptPath,15728640,["application/pdf","text/plain"]);
   const topics=Array.isArray(d.topics)?[...new Set(d.topics.map(v=>string(v,80)).filter(Boolean))].slice(0,8):[];
+  const transcriptText=(d.allowTranscript===true&&transcriptPath.endsWith(".txt"))?string(d.transcriptText,80000):"";
   const audioUrl=await getDownloadURL(audio);
   const record={title:d.title.trim(),series:d.series.trim(),speaker:d.speaker.trim(),topics,
    date:day,description:d.description.trim(),published:true,createdAt:FieldValue.serverTimestamp(),
    authorUid:user.uid,audioPath,artworkPath,notesPath,slidesPath,transcriptPath,
    notesUrl:d.shareResources===true?notesUrl:"",slidesUrl:d.shareResources===true?slidesUrl:"",
-   transcriptUrl:d.allowTranscript===true?transcriptUrl:"",allowDownload:d.allowDownload===true,
+   transcriptUrl:d.allowTranscript===true?transcriptUrl:"",transcriptText,allowDownload:d.allowDownload===true,
    audioUrl,artworkUrl,audioBytes,audioType:meta.contentType||"audio/mpeg"};
   const doc=getFirestore().collection("sermons").doc(id);
   if((await doc.get()).exists)return bad(res,409,"Already published");

@@ -253,7 +253,7 @@ const MEDIA_FEED="https://us-west1-bay-marin-church-website.cloudfunctions.net/s
 const xmlSafe=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&apos;"}[c]));
 async function findPublishedMessages(max){
  const snapshot=await getFirestore().collection("sermons").where("published","==",true).orderBy("date","desc").limit(max).get();
- return snapshot.docs.map(doc=>({id:doc.id,...doc.data(),createdAt:undefined}));
+ return snapshot.docs.map(doc=>{const d=doc.data();return {id:doc.id,title:d.title||"",series:d.series||"",speaker:d.speaker||"",speakerTitle:d.speakerTitle||"",speakerChurch:d.speakerChurch||"",description:d.description||"",date:d.date||"",topics:d.topics||[],audioUrl:d.audioUrl||"",audioBytes:d.audioBytes||0,audioType:d.audioType||"audio/mpeg",artworkUrl:d.artworkUrl||"",seriesArtworkUrl:d.seriesArtworkUrl||"",notesUrl:d.notesUrl||"",slidesUrl:d.slidesUrl||"",transcriptUrl:d.transcriptUrl||"",transcriptText:d.transcriptText||"",allowDownload:d.allowDownload===true,allowShare:d.allowShare!==false,photos:d.photos||[]};});
 }
 // Safe readiness probe: confirms the deployed API can reach the sermon database.
 // It intentionally never exposes publisher identities, secrets or stored records.
@@ -382,7 +382,7 @@ exports.stageMessage=onRequest({region:"us-west1",cors:MEDIA_ORIGINS,invoker:"pu
   const record={
    id,title:string(d.title,160),series:string(d.series,120),speaker:string(d.speaker,120),
    speakerTitle,speakerChurch,description:string(d.description,5000),date:day,topics,
-   authorUid:user.uid,confirmationEmail:email,reviewStatus:"pending_review",published:false,
+   authorUid:user.uid,reviewStatus:"pending_review",published:false,
    allowDownload:d.allowDownload===true,allowShare:d.allowShare!==false,
    shareResources:d.shareResources===true,allowTranscript:d.allowTranscript===true,
    transcriptText:d.allowTranscript===true&&results.transcript.path.endsWith(".txt")?string(d.transcriptText,80000):"",
@@ -398,6 +398,7 @@ exports.stageMessage=onRequest({region:"us-west1",cors:MEDIA_ORIGINS,invoker:"pu
   const doc=getFirestore().collection("sermons").doc(id);
   // Creating is atomic; a repeated request cannot overwrite a previously approved sermon.
   await doc.create(record);
+  await getFirestore().collection("media_receipts").doc(id).create({ownerUid:user.uid,email,createdAt:FieldValue.serverTimestamp()});
   const emailed=await mediaReceipt(email,record,"review");
   return res.status(201).json({ok:true,id,reviewStatus:"pending_review",emailSent:emailed,reviewUrl:MEDIA_SITE+"/media/?draft="+encodeURIComponent(id)});
  }catch(e){
@@ -433,9 +434,11 @@ exports.finalizeMessage=onRequest({region:"us-west1",cors:MEDIA_ORIGINS,invoker:
    const m=snap.data();
    if(m.published||m.reviewStatus!=="pending_review")throw Object.assign(Error("Message has already been processed"),{code:409});
    tx.update(ref,{published:true,reviewStatus:"published",approvedBy:user.uid,approvedAt:FieldValue.serverTimestamp(),updatedAt:FieldValue.serverTimestamp()});
-   return {id,title:m.title,date:m.date,speaker:m.speaker,confirmationEmail:m.confirmationEmail};
+   return {id,title:m.title,date:m.date,speaker:m.speaker};
   });
-  const emailed=await mediaReceipt(published.confirmationEmail,published,"published");
+  const receipt=await getFirestore().collection("media_receipts").doc(id).get();
+  const email=receipt.exists&&receipt.data()?.ownerUid===user.uid?receipt.data().email:"";
+  const emailed=await mediaReceipt(email,published,"published");
   return res.json({ok:true,id,emailSent:emailed,libraryUrl:MEDIA_SITE+"/?message="+encodeURIComponent(id)+"#messages",
    podcastFeed:MEDIA_FEED,spotifyStatus:"RSS available when feed is connected; Spotify ingestion not confirmed"});
  }catch(e){console.error("Finalize media failed",e?.name);return bad(res,e.code>=400&&e.code<500?e.code:503,e.code>=400&&e.code<500?e.message:"Publication could not complete");}

@@ -56,7 +56,7 @@ function createMail(data){
  const email=string(data.email,200);
  const subject=isVisit?"[VISIT REQUEST] Plan My Visit - BayMarin":isConnect?"[STAY CONNECTED] BayMarin":isGroup?"[COMMUNITY GROUP INTEREST] "+string(data.group,120)+" - BayMarin":"["+(string(data.topic,120)||"GENERAL QUESTION").toUpperCase()+"] BayMarin Website";
  const rows=isVisit?[
-  ["Name",name],["Email",email],["Phone",string(data.phone,80)||"Not provided"],
+  ["Form type","Plan a Visit"],["Name",name],["Email",email],["Phone",string(data.phone,80)||"Not provided"],
   ["Visit date",string(data.date,20)],["Service",string(data.service,120)],
   ["Location",string(data.location,150)],["Bringing children",string(data.children,30)],
   ["Children details",string(data.childrenDetails,250)||"Not provided"],
@@ -69,7 +69,7 @@ function createMail(data){
  const cleanName=name.trim().split(/\s+/)[0].replace(/[^\p{L}\p{N}'-]/gu,"").slice(0,50)||"there";
  const acknowledgement=isVisit
  ? "Hi "+cleanName+",\n\nWe're looking forward to welcoming you to BayMarin! We received your request to visit on "+string(data.date,20)+".\n\nGathering: Sunday at 10:00 AM\nWhere: "+VISIT_ADDRESS+"\nDirections: "+VISIT_MAP+"\n\nOur staff team will review your request and aims to respond within 24–48 hours, often sooner. "+(data.reminders===true?"You'll also receive a helpful reminder as Sunday approaches.":"You have not signed up for visit reminder emails.")+"\n\nNeed to change your plans or ask a question? Email info@baymarin.org.\n\nWe're glad you're coming!\nBayMarin Church"
- : "Hi "+cleanName+",\n\nThank you for reaching out to BayMarin Church. We received your message. Someone from our staff team will review it and aim to respond within 24–48 hours, often sooner.\n\nIf your need is urgent, please contact info@baymarin.org directly.\n\nWe're glad you connected with us!\nBayMarin Church";
+ : "Hi "+cleanName+",\n\nThank you for reaching out to BayMarin Church. We received your "+(isGroup?"Community Group Interest ("+string(data.group,120)+")":isConnect?"Stay Connected":string(data.topic,120)||"General Question")+" form. Someone from our staff team will review it and aim to respond within 24–48 hours, often sooner.\n\nIf your need is urgent, please contact info@baymarin.org directly.\n\nWe're glad you connected with us!\nBayMarin Church";
  const staffMessage={from:mailFrom.value(),to:[STAFF_EMAIL],reply_to:email,
   subject:subject+" — "+name.trim(),html:"<h2>New "+escapeHtml(isVisit?"visit request":isGroup?"community group interest request":isConnect?"stay connected request":"question")+"</h2><table cellspacing='0' border='0' style='border-collapse:collapse'>"+htmlRows+"</table>"};
  const replyMessage={from:mailFrom.value(),to:[email],reply_to:STAFF_EMAIL,
@@ -92,7 +92,7 @@ function createMail(data){
    "Submitting this form is an expression of interest, not confirmation of group enrollment."
   ],"EXPLORE BAYMARIN","https://bay-marin-church-website.web.app")
   :brandedEmail("Your message is with us.","THANK YOU FOR REACHING OUT",[
-   "Hi "+cleanName+", your message has been received by BayMarin.",
+   "Hi "+cleanName+", your "+(string(data.topic,120)||"general inquiry")+" form was received by BayMarin.",
    "Someone from our staff team will review it and aims to reply within 24–48 hours, often sooner."
   ],"EXPLORE BAYMARIN","https://bay-marin-church-website.web.app")};
  return [staffMessage,replyMessage];

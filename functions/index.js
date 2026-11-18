@@ -445,3 +445,24 @@ exports.finalizeMessage=onRequest({region:"us-west1",cors:MEDIA_ORIGINS,invoker:
    podcastFeed:MEDIA_FEED,spotifyStatus:"RSS available when feed is connected; Spotify ingestion not confirmed"});
  }catch(e){console.error("Finalize media failed",e?.name);return bad(res,e.code>=400&&e.code<500?e.code:503,e.code>=400&&e.code<500?e.message:"Publication could not complete");}
 });
+
+/**
+ * Public, read-only Community Group events feed.
+ * Only approved published future events are returned; no private attendee data.
+ * Staff automation writes documents to group_events via privileged Admin SDK.
+ */
+exports.listGroupEvents=onRequest({region:"us-west1",cors:[...allowedHosts].map(h=>"https://"+h)},async(req,res)=>{
+ if(req.method!=="GET")return bad(res,405,"Method not allowed");
+ res.set("Cache-Control","public, max-age=60, s-maxage=120");
+ try{
+  const snap=await getFirestore().collection("group_events").where("status","==","published").limit(150).get();
+  const now=Date.now();
+  const events=snap.docs.map(doc=>{
+   const x=doc.data();
+   const start=x.start?.toDate?.()?.toISOString?.()||x.start;
+   const end=x.end?.toDate?.()?.toISOString?.()||x.end||start;
+   return {id:doc.id,title:string(x.title,160),group:string(x.group,100),location:string(x.location,200),start,end,status:"published",registrationUrl:typeof x.registrationUrl==="string"&&/^https:\/\//.test(x.registrationUrl)?x.registrationUrl:""};
+  }).filter(e=>e.title&&Number.isFinite(Date.parse(e.start))&&Date.parse(e.end)>=now).sort((a,b)=>Date.parse(a.start)-Date.parse(b.start)).slice(0,30);
+  res.json({ok:true,events});
+ }catch(e){console.error("listGroupEvents",e);bad(res,500,"Events are temporarily unavailable")}
+});

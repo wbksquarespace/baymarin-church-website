@@ -6,7 +6,9 @@ service firebase.storage {
     && firestore.get(/databases/(default)/documents/media_publishers/$(request.auth.uid)).data.active == true;
   }
   match /sermons/{uid}/{sermonId}/{filename} {
-   allow read: if true;
+   allow read: if (authorized() && request.auth.uid == uid)
+     || (firestore.exists(/databases/(default)/documents/sermons/$(sermonId))
+       && firestore.get(/databases/(default)/documents/sermons/$(sermonId)).data.published == true);
    allow create: if authorized() && request.auth.uid == uid
      && filename.matches('^(message\\.(mp3|m4a)|artwork\\.(jpg|jpeg|png|webp)|seriesArtwork\\.(jpg|jpeg|png|webp)|notes\\.(pdf|docx|txt)|slides\\.(pdf|pptx)|transcript\\.(pdf|txt)|photo[123]\\.(jpg|jpeg|png|webp))$')
      && request.resource.size < 262144000

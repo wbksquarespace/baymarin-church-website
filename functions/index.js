@@ -53,7 +53,7 @@ function createMail(data){
  const isConnect=data.kind==="connect";
  const name=isVisit?string(data.first,80)+" "+string(data.last,80):string(data.name,120);
  const email=string(data.email,200);
- const subject=isVisit?"Plan My Visit - BayMarin":isConnect?"Stay Connected - BayMarin":"Question from BayMarin Website";
+ const subject=isVisit?"Plan My Visit - BayMarin":isConnect?"Stay Connected - BayMarin":(string(data.topic,120)||"Question")+" - BayMarin Website";
  const rows=isVisit?[
   ["Name",name],["Email",email],["Phone",string(data.phone,80)||"Not provided"],
   ["Visit date",string(data.date,20)],["Service",string(data.service,120)],
@@ -63,7 +63,7 @@ function createMail(data){
   ["How they heard",string(data.how,150)||"Not provided"],
   ["Questions",string(data.help,1500)||"None"],
   ["Follow-up requested",data.contact?"Yes":"No"],["Email reminders opted in",data.reminders===true?"Yes":"No"]
- ]:isConnect?[["Name",name],["Email",email],["Request","Please help me stay connected with BayMarin."]]:[["Name",name],["Email",email],["Message",string(data.message,2500)]];
+ ]:isConnect?[["Name",name],["Email",email],["Request","Please help me stay connected with BayMarin."]]:[["Name",name],["Email",email],["Phone",string(data.phone,80)||"Not provided"],["Interest",string(data.topic,120)||"General question"],["Message",string(data.message,2500)]];
  const htmlRows=rows.map(([a,b])=>"<tr><th align='left' style='padding:9px;background:#edf3ee;vertical-align:top'>"+escapeHtml(a)+"</th><td style='padding:9px;white-space:pre-wrap'>"+escapeHtml(b)+"</td></tr>").join("");
  const cleanName=name.trim().split(/\s+/)[0].replace(/[^\p{L}\p{N}'-]/gu,"").slice(0,50)||"there";
  const acknowledgement=isVisit

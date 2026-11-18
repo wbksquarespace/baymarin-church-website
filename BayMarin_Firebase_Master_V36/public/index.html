@@ -530,6 +530,24 @@ body.bm-leader-modal-open{overflow:hidden}
 .bm-latest-art-caption{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:22px 3px 2px;font-size:10px;font-weight:850;letter-spacing:.12em;color:#285d46}
 @media(max-width:800px){.bm-latest-message-section{grid-template-columns:1fr;padding:69px 22px;gap:32px}.bm-latest-message-info h2{font-size:clamp(48px,8vw,75px)}.bm-latest-message-art{max-width:550px}.bm-latest-portrait{aspect-ratio:1.35}}
 @media(max-width:520px){.bm-latest-message-section{padding:62px 19px}.bm-latest-message-info h2{font-size:clamp(44px,10.7vw,62px)}.bm-latest-message-art{display:none}.bm-latest-audio{margin:27px 0}.bm-latest-message-info h3{font-size:29px}}
+</style><style id="bm-message-archive-v1">
+#internalPage:has(.bm-message-archive){padding:0;background:#f6f7f3}
+#internalPage:has(.bm-message-archive)>#pageKicker,#internalPage:has(.bm-message-archive)>#pageTitle,#internalPage:has(.bm-message-archive)>#pageDesc{display:none}
+#internalPage:has(.bm-message-archive)>#pagePanel{width:100%;max-width:none;border:0;box-shadow:none;background:none;border-radius:0;padding:0;margin:0}
+#internalPage:has(.bm-message-archive)>a.pill{display:none}
+.bm-message-archive{padding:clamp(76px,8vw,136px) clamp(22px,7vw,128px)}
+.bm-message-archive>.kicker{font-size:12px;color:#34735b;letter-spacing:.17em}
+.bm-message-archive h2{font-size:clamp(50px,7vw,110px);line-height:1.04;letter-spacing:-.08em;color:#183e30;margin:16px 0 27px}
+.bm-message-archive h2 em{font:italic 400 1em/1 Georgia,serif;color:#4f7e64}
+.bm-message-archive>p{font-size:clamp(18px,1.5vw,23px);color:#506756;max-width:800px}
+.bm-message-archive-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;margin:54px 0}
+.bm-message-archive-card{border-radius:25px;background:white;padding:clamp(25px,3vw,48px)}
+.bm-message-archive-card .kicker{font-size:11px;letter-spacing:.11em;color:#3b785b}
+.bm-message-archive-card h3{font-size:clamp(28px,3vw,46px);letter-spacing:-.06em;line-height:1.11;color:#163d30;margin:18px 0 12px}
+.bm-message-archive-card p{color:#486453;line-height:1.7}
+.bm-message-archive-card audio{width:100%;margin-top:18px}
+.bm-archive-original{font-size:13px;font-weight:850;letter-spacing:.07em;text-decoration:none;color:#1b5d44}
+@media(max-width:730px){.bm-message-archive-grid{grid-template-columns:1fr}.bm-message-archive{padding:65px 20px}.bm-message-archive h2{font-size:clamp(45px,10vw,63px)}}
 </style></head><body><div class="topline">SUNDAYS AT 10:00 AM · GUZMAN HALL · SAN RAFAEL</div><header class="nav" id="nav"><a aria-label="BayMarin Home" class="wordmark" data-baymarin-target="home" role="button" tabindex="0">baymarin<span>CHURCH</span></a><div class="navright"><nav aria-label="Primary" class="desktopnav"><div class="bm-navdrop"><button type="button" class="bm-navdrop-toggle" aria-expanded="false">I'M NEW HERE <span>⌄</span></button><div class="bm-navdrop-links"><a data-baymarin-target="new" role="button" tabindex="0">Sundays</a><a data-baymarin-target="starting-point" role="button" tabindex="0">Starting Point</a><a data-baymarin-target="membership" role="button" tabindex="0">Membership Matters</a><a data-baymarin-target="about" role="button" tabindex="0">About Us</a></div></div><div class="bm-navdrop bm-grow-drop"><button type="button" class="bm-navdrop-toggle" aria-expanded="false" aria-controls="bmGrowMenu">GROW <span aria-hidden="true">⌄</span></button><div id="bmGrowMenu" class="bm-navdrop-links"><a href="https://baymarin.churchcenter.com/registrations/events" target="_blank" rel="noopener noreferrer">EVENTS ↗</a><a data-baymarin-target="groups" role="button" tabindex="0">COMMUNITY GROUPS</a><a data-baymarin-target="kids" role="button" tabindex="0">FAMILY MINISTRIES</a><a data-baymarin-target="baptisms" role="button" tabindex="0">BAPTISMS &amp; DEDICATIONS</a></div></div><a data-baymarin-target="serve" role="button" tabindex="0">SERVE</a><a data-baymarin-target="resources" role="button" tabindex="0">RESOURCES</a></nav><div class="bm-header-actions"><a class="bm-header-pill" data-baymarin-target="give" role="button" tabindex="0">GIVE</a><a class="bm-header-pill" data-baymarin-target="new" role="button" tabindex="0">JOIN US</a></div><button aria-controls="menu" aria-expanded="false" aria-label="Open menu" class="menu-btn" id="menuBtn"><i></i></button></div></header>
 <div aria-label="BayMarin navigation" aria-modal="true" class="overlay" id="menu" role="dialog"><div class="overlay-top"><a aria-label="BayMarin home" class="wordmark" data-baymarin-target="home" role="button" tabindex="0">baymarin<span>CHURCH</span></a><button aria-label="Close menu" class="close" id="closeMenu">×</button></div><div class="menu-grid">
 <div class="menu-group"><button aria-expanded="false" class="accordion-trigger" type="button">I'm New Here<span aria-hidden="true">⌄</span></button><div class="accordion-links"><a data-baymarin-target="new" role="button" tabindex="0">Sundays</a><a data-baymarin-target="starting-point" role="button" tabindex="0">Starting Point</a><a data-baymarin-target="membership" role="button" tabindex="0">Membership Matters</a><a data-baymarin-target="about" role="button" tabindex="0">About Us</a></div></div>
@@ -628,7 +646,7 @@ baptisms:['Baptisms & Dedications','Explore meaningful steps of faith.',`<div cl
 <section class="bm-grow-details"><span class="kicker">TAKE A NEXT STEP</span><h2>Begin with a conversation.</h2><div class="bm-grow-info-grid"><article><h3>Considering baptism?</h3><p>Ask questions about baptism, its meaning, and the next steps available through BayMarin.</p></article><article><h3>Thinking about a dedication?</h3><p>We can help you connect with someone to discuss family dedications and current opportunities.</p></article><article><h3>A personal conversation</h3><p>We will not assume where you are in your faith journey. Start with a question and we will connect you with the right person.</p></article></div><div class="bm-grow-actions"><button type="button" class="pill green" data-bm-question-open>ASK A QUESTION</button><a class="pill light" href="https://baymarin.churchcenter.com/home" target="_blank" rel="noopener noreferrer">EXPLORE CHURCH CENTER ↗</a></div></section>
 <section class="bm-grow-ending"><span class="kicker">YOU'RE WELCOME HERE</span><h2>There's room to <em>belong.</em></h2><p>Wherever you're starting from, we'd love to connect and help you discover what's happening at BayMarin.</p><a class="pill green" data-baymarin-target="new" role="button" tabindex="0">JOIN US SUNDAY</a></section>
 </div>`],
-messages:['Watch & Listen','Explore teaching and messages from BayMarin.',panel('Stay connected to teaching','The dedicated message library is being prepared. In the meantime, visit the current BayMarin website.',`<a class="pill green" href="https://baymarin.org" target="_blank" rel="noopener">Visit BayMarin.org</a>`) ],
+messages:['Messages','Listen to the latest teaching from BayMarin.',`<div class="bm-message-archive"><div class="kicker">SERMONS & CONVERSATIONS</div><h2>Listen, reflect, <em>grow.</em></h2><p>Sunday messages from BayMarin, available wherever life takes you.</p><div id="bmMessageArchive" class="bm-message-archive-grid"><article class="bm-message-archive-card"><span class="kicker">MAY 24, 2026 · DAVE ROBINSON</span><h3>Thinking Big By Thinking Small</h3><p>The latest recording published on BayMarin's existing messages page.</p><audio preload="none" controls aria-label="Listen to Thinking Big By Thinking Small"><source src="https://static1.squarespace.com/static/61db6ec921c0a76f5b5b2cf0/t/6a1464b8addd7f6c8ec40f05/1779721566473/Sunday%2C%2B5.24.26%2C%2Bmessage.m4a" type="audio/mp4"></audio></article></div><a class="bm-archive-original" href="https://baymarin.org/messages" target="_blank" rel="noopener noreferrer">BROWSE EARLIER MESSAGES ON BAYMARIN.ORG ↗</a></div>`],
 serve:['Serve','Bring your gifts to the work of loving our neighbors.',panel('Service with purpose','Whether you enjoy welcoming people, supporting gatherings, or working alongside community partners, we would love to start a conversation.',`<a class="pill green" data-baymarin-target="join" role="button" tabindex="0">Join a Team</a><a class="pill dark" data-baymarin-target="partners" role="button" tabindex="0">Community Partnerships</a>`) ],
 join:['Join a Team','There is a place for your gifts and interests.',panel('Let’s serve together','Tell us what you enjoy doing, and we can help you explore ways to get involved.',action('I would like to join a BayMarin team','Ask About Serving'))],
 partners:['Community Partnerships','Love our neighbors in meaningful ways.',panel('Community partnerships','BayMarin is committed to participating in restoration and care for others. Reach out to learn about current opportunities.',action('BayMarin community partnerships','Ask About Partnerships'))],
@@ -855,5 +873,40 @@ document.addEventListener('click',function(event){const card=event.target.closes
    else if(!event.shiftKey&&document.activeElement===visible[visible.length-1]){event.preventDefault();visible[0].focus();}
   }
  });
+})();
+</script><script id="bm-sermon-library-sync-v1">
+(function(){
+ const endpoint="https://us-west1-bay-marin-church-website.cloudfunctions.net/latestMessage";
+ function txt(value){return String(value==null?'':value);}
+ function format(date){const d=new Date(date+'T12:00:00');return Number.isFinite(d.getTime())?d.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}):date;}
+ function episodeCard(message){
+  const card=document.createElement('article');card.className='bm-message-archive-card';
+  const top=document.createElement('span');top.className='kicker';top.textContent=format(message.date)+' · '+message.speaker;
+  const title=document.createElement('h3');title.textContent=message.title;
+  const desc=document.createElement('p');desc.textContent=message.description||message.series||'BayMarin Sunday message';
+  const player=document.createElement('audio');player.controls=true;player.preload='none';player.src=message.audioUrl;
+  player.setAttribute('aria-label','Listen to '+message.title);
+  card.append(top,title,desc,player);return card;
+ }
+ function syncLibrary(sermons){
+  if(!Array.isArray(sermons)||!sermons.length)return;
+  const newest=sermons[0];
+  const title=document.getElementById('bmLatestTitle');if(title)title.textContent=newest.title;
+  const speaker=document.getElementById('bmLatestSpeaker');if(speaker)speaker.textContent=txt(newest.speaker).toUpperCase();
+  const date=document.getElementById('bmLatestDate');if(date)date.textContent=format(newest.date).toUpperCase();
+  const player=document.getElementById('bmLatestAudio');
+  if(player&&newest.audioUrl){player.src=newest.audioUrl;player.load();}
+  const artwork=document.getElementById('bmLatestArtwork');
+  if(artwork&&newest.artworkUrl){artwork.src=newest.artworkUrl;artwork.alt='Artwork for '+newest.title;}
+  window.bmPublishedMessages=sermons;
+  renderArchive();
+ }
+ function renderArchive(){
+  const grid=document.getElementById('bmMessageArchive');
+  if(!grid||!Array.isArray(window.bmPublishedMessages)||!window.bmPublishedMessages.length)return;
+  grid.replaceChildren(...window.bmPublishedMessages.map(episodeCard));
+ }
+ document.addEventListener('click',event=>{if(event.target.closest('[data-baymarin-target="messages"]'))setTimeout(renderArchive,30)});
+ fetch(endpoint,{mode:'cors'}).then(r=>r.ok?r.json():Promise.reject(Error('Not yet active'))).then(d=>{if(d.ok)syncLibrary(d.messages)}).catch(()=>{});
 })();
 </script></body></html>

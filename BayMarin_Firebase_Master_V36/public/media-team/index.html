@@ -100,12 +100,12 @@ $("messageForm").onsubmit=async event=>{
   let notesPath="",slidesPath="",transcriptPath="";
   if(notes){info("Uploading sermon notes…");notesPath=folder+"notes."+notes.name.split(".").pop().toLowerCase();await upload(notesPath,notes);}
   if(slides){info("Uploading presentation slides…");slidesPath=folder+"slides."+slides.name.split(".").pop().toLowerCase();await upload(slidesPath,slides);}
-  if(transcript){info("Uploading approved transcript…");transcriptPath=folder+"transcript."+transcript.name.split(".").pop().toLowerCase();await upload(transcriptPath,transcript);}
+  if(transcript){info("Uploading approved transcript…");transcriptPath=folder+"transcript."+transcript.name.split(".").pop().toLowerCase();await upload(transcriptPath,transcript);if(transcript.name.toLowerCase().endsWith(".txt")){d.transcriptText=(await transcript.text()).slice(0,80000);}}
   info("Finalizing message on BayMarin…");
   const token=await auth.currentUser.getIdToken();
   const response=await fetch(api,{method:"POST",headers:{"Authorization":"Bearer "+token,"Content-Type":"application/json"},body:JSON.stringify({...d,id,audioPath:filePath,artworkPath:artPath,notesPath,slidesPath,transcriptPath,audioBytes:audio.size})});
   const result=await response.json();if(!response.ok||!result.ok)throw Error(result.message||"Could not publish");
-  info("Published successfully! The website and podcast feed now contain this message. Spotify updates after it checks the feed.");
+  info("Published successfully! The library and podcast feed now contain this message. Spotify will update only after its RSS feed is connected and refreshed.");
   $("messageForm").reset();$("audioPreview").hidden=true;
  }catch(e){info("Publish did not finish: "+e.message+" The previous message remains live. Check your connection or contact the site administrator.");}
  finally{submit.disabled=false;}

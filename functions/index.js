@@ -289,8 +289,11 @@ exports.publishMessage=onRequest({region:"us-west1",cors:MEDIA_ORIGINS,invoker:"
   if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id))return bad(res,400,"Invalid ID");
   const folder="sermons/"+user.uid+"/"+id+"/";
   const audioPath=String(d.audioPath||""),artworkPath=String(d.artworkPath||"");
+  const notesPath=String(d.notesPath||""),slidesPath=String(d.slidesPath||"");
   if(!audioPath.startsWith(folder)||!/^message\.(mp3|m4a)$/i.test(audioPath.slice(folder.length)))return bad(res,400,"Invalid audio path");
   if(artworkPath&&(!artworkPath.startsWith(folder)||!/^artwork\.(jpg|jpeg|png|webp)$/i.test(artworkPath.slice(folder.length))))return bad(res,400,"Invalid artwork path");
+  if(notesPath&&(!notesPath.startsWith(folder)||!/^notes\.(pdf|docx|txt)$/i.test(notesPath.slice(folder.length))))return bad(res,400,"Invalid notes path");
+  if(slidesPath&&(!slidesPath.startsWith(folder)||!/^slides\.(pdf|pptx)$/i.test(slidesPath.slice(folder.length))))return bad(res,400,"Invalid slides path");
   const bucket=getStorage().bucket(),audio=bucket.file(audioPath);
   const [hasAudio]=await audio.exists();if(!hasAudio)return bad(res,400,"Audio wasn't uploaded");
   const [meta]=await audio.getMetadata();
@@ -304,10 +307,21 @@ exports.publishMessage=onRequest({region:"us-west1",cors:MEDIA_ORIGINS,invoker:"
    if(Number(artMeta.size)>12582912||!String(artMeta.contentType||"").startsWith("image/"))return bad(res,400,"Invalid artwork");
    artworkUrl=await getDownloadURL(artwork);
   }
+  async function resource(path,maxBytes,allowedTypes){
+    if(!path)return "";
+    const file=bucket.file(path),[exists]=await file.exists();
+    if(!exists)throw Error("Attachment not uploaded");
+    const [details]=await file.getMetadata();
+    if(!Number(details.size)||Number(details.size)>maxBytes||!allowedTypes.includes(details.contentType))throw Error("Invalid attachment");
+    return getDownloadURL(file);
+  }
+  const notesUrl=await resource(notesPath,15728640,["application/pdf","application/vnd.openxmlformats-officedocument.wordprocessingml.document","text/plain"]);
+  const slidesUrl=await resource(slidesPath,52428800,["application/pdf","application/vnd.openxmlformats-officedocument.presentationml.presentation"]);
+  const topics=Array.isArray(d.topics)?[...new Set(d.topics.map(v=>string(v,80)).filter(Boolean))].slice(0,8):[];
   const audioUrl=await getDownloadURL(audio);
-  const record={title:d.title.trim(),series:d.series.trim(),speaker:d.speaker.trim(),
+  const record={title:d.title.trim(),series:d.series.trim(),speaker:d.speaker.trim(),topics,
    date:day,description:d.description.trim(),published:true,createdAt:FieldValue.serverTimestamp(),
-   authorUid:user.uid,audioPath,artworkPath,audioUrl,artworkUrl,audioBytes,audioType:meta.contentType||"audio/mpeg"};
+   authorUid:user.uid,audioPath,artworkPath,notesPath,slidesPath,notesUrl,slidesUrl,audioUrl,artworkUrl,audioBytes,audioType:meta.contentType||"audio/mpeg"};
   const doc=getFirestore().collection("sermons").doc(id);
   if((await doc.get()).exists)return bad(res,409,"Already published");
   await doc.create(record);

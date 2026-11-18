@@ -1,0 +1,36 @@
+name: Deploy BayMarin Sermon Publishing Backend
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: baymarin-sermon-backend
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy secured sermon API and Firebase rules
+    runs-on: ubuntu-latest
+    environment: sermon-production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check Cloud Functions JavaScript
+        run: node --check functions/index.js
+      - name: Install backend dependencies
+        run: npm --prefix functions install
+      - name: Authenticate with approved Firebase service account
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_BAY_MARIN_CHURCH_WEBSITE }}'
+      - name: Install Firebase CLI
+        run: npm install --global firebase-tools
+      - name: Deploy Firestore and Storage security rules
+        run: firebase deploy --only firestore:rules,firestore:indexes,storage --project bay-marin-church-website --non-interactive
+      - name: Deploy sermon publishing functions
+        run: firebase deploy --only functions:publishMessage,functions:latestMessage,functions:sermonFeed --project bay-marin-church-website --non-interactive

@@ -13,32 +13,8 @@ service firebase.storage {
      && ((filename.matches('^message\\.(mp3|m4a)$') && request.resource.contentType.matches('^audio/.*$'))
        || (filename.matches('^artwork\\.(jpg|jpeg|png|webp)$') && request.resource.size < 12582912 && request.resource.contentType.matches('^image/.*$'))
        || (filename.matches('^notes\\.(pdf|docx|txt)$') && request.resource.size < 15728640 && request.resource.contentType.matches('^(application/pdf|application/vnd.openxmlformats-officedocument.wordprocessingml.document|text/plain)$'))
-       || (filename.matches('^slides\\.(pdf|pptx)
-   allow update,delete: if false;
-  }
-  match /{allPaths=**} {allow read,write: if false;}
- }
-}
-) && request.resource.size < 52428800 && request.resource.contentType.matches('^(application/pdf|application/vnd.openxmlformats-officedocument.presentationml.presentation)
-   allow update,delete: if false;
-  }
-  match /{allPaths=**} {allow read,write: if false;}
- }
-}
-))
-       || (filename.matches('^transcript\\.(pdf|txt)
-   allow update,delete: if false;
-  }
-  match /{allPaths=**} {allow read,write: if false;}
- }
-}
-) && request.resource.size < 15728640 && request.resource.contentType.matches('^(application/pdf|text/plain)
-   allow update,delete: if false;
-  }
-  match /{allPaths=**} {allow read,write: if false;}
- }
-}
-)));
+       || (filename.matches('^slides\\.(pdf|pptx)$') && request.resource.size < 52428800 && request.resource.contentType.matches('^(application/pdf|application/vnd.openxmlformats-officedocument.presentationml.presentation)$'))
+       || (filename.matches('^transcript\\.(pdf|txt)$') && request.resource.size < 15728640 && request.resource.contentType.matches('^(application/pdf|text/plain)$')));
    allow update,delete: if false;
   }
   match /{allPaths=**} {allow read,write: if false;}

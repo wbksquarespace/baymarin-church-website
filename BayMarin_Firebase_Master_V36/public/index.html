@@ -703,15 +703,25 @@ document.getElementById('signupBtn')?.addEventListener('click',async function(){
 </script>
 <style>[data-baymarin-target]{cursor:pointer}</style><script id="baymarin-nav-v36">
 (function(){
-  const dropdown=document.querySelector('.bm-navdrop');
-  if(!dropdown)return;
-  const toggle=dropdown.querySelector('.bm-navdrop-toggle');
-  const links=dropdown.querySelector('.bm-navdrop-links');
-  if(links)links.setAttribute('aria-label',"I'm New Here pages");
-  function close(){dropdown.classList.remove('open');toggle.setAttribute('aria-expanded','false')}
-  toggle.addEventListener('click',function(){const opened=dropdown.classList.toggle('open');toggle.setAttribute('aria-expanded',String(opened));});
-  document.addEventListener('click',function(event){if(!dropdown.contains(event.target))close();else if(event.target.closest('.bm-navdrop-links [data-baymarin-target]'))close()});
-  document.addEventListener('keydown',function(event){if(event.key==='Escape'){close();if(dropdown.contains(document.activeElement))toggle.focus()}});
+ const drops=[...document.querySelectorAll('.desktopnav .bm-navdrop')];
+ function close(drop){drop.classList.remove('open');drop.querySelector('.bm-navdrop-toggle')?.setAttribute('aria-expanded','false');}
+ drops.forEach(drop=>{
+  const toggle=drop.querySelector('.bm-navdrop-toggle');
+  if(!toggle)return;
+  const content=drop.querySelector('.bm-navdrop-links');
+  if(content&&!content.hasAttribute('aria-label'))content.setAttribute('aria-label',toggle.textContent.trim()+' menu');
+  toggle.addEventListener('click',()=>{
+   const opening=!drop.classList.contains('open');drops.forEach(close);
+   drop.classList.toggle('open',opening);toggle.setAttribute('aria-expanded',String(opening));
+  });
+  drop.addEventListener('focusout',e=>{if(!drop.contains(e.relatedTarget))close(drop);});
+ });
+ document.addEventListener('click',event=>{
+  drops.forEach(drop=>{if(!drop.contains(event.target)||event.target.closest('.bm-navdrop-links a'))close(drop);});
+ });
+ document.addEventListener('keydown',event=>{
+  if(event.key==='Escape')drops.forEach(drop=>{const focus=drop.contains(document.activeElement);close(drop);if(focus)drop.querySelector('.bm-navdrop-toggle')?.focus();});
+ });
 })();
 </script><div class="visit-modal" id="bmQuestionModal" role="presentation" hidden>
 <section class="visit-dialog" role="dialog" aria-modal="true" aria-labelledby="bmQuestionModalTitle" aria-describedby="bmQuestionModalDesc">

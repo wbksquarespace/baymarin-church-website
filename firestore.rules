@@ -12,6 +12,7 @@ service cloud.firestore {
    allow list: if resource.data.published == true;
    allow create,update,delete: if false; // Only the verified Admin function publishes.
   }
+  match /media_receipts/{id} {allow read,write: if false;} // Confirmation addresses are server-only.
   match /visitor_reminders/{id} {allow read,write: if false;}
   match /{document=**} {allow read,write: if false;}
  }

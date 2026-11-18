@@ -151,6 +151,32 @@
  #internalPage:has(.bm-sunday34) .bm34-photo{aspect-ratio:1.1}
  #internalPage:has(.bm-sunday34) .page-actions{display:flex;flex-wrap:wrap;gap:10px}
 }
+</style><style id="bm-question-section-style">
+#internalPage .bm-sunday34 .bm-question-section{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:clamp(30px,5vw,100px);align-items:center;text-align:left;background:#f0f2f1;color:#101a17;padding:clamp(75px,9vw,150px) clamp(28px,8vw,150px);border-radius:0;margin:0}
+#internalPage .bm-sunday34 .bm-question-section .kicker{display:block;color:#173e32;font-size:clamp(12px,1vw,15px);font-weight:800;letter-spacing:.14em}
+#internalPage .bm-sunday34 .bm-question-section h2{color:#111a17;font-size:clamp(46px,5.5vw,90px);letter-spacing:-.07em;line-height:1.04;margin:12px 0 0;font-weight:800}
+#internalPage .bm-sunday34 .bm-question-section h2 em{color:#111a17;font-family:Georgia,serif;font-style:italic;font-weight:400;letter-spacing:-.075em}
+#internalPage .bm-sunday34 .bm-question-section p{color:#202c26;font-size:clamp(17px,1.35vw,21px);line-height:1.65;max-width:590px;margin:0 0 26px;text-align:left}
+#internalPage .bm-sunday34 .bm-question-section p a{color:#1c5846;text-decoration:underline;text-underline-offset:4px}
+#internalPage .bm-sunday34 .bm-question-section .bm-question-open{margin:0;padding:17px 34px;min-width:205px;background:#173e32;color:#fff;border:0;font-weight:800;cursor:pointer}
+#bmQuestionModal{z-index:10010}
+#bmQuestionModal .visit-dialog{max-width:610px}
+#bmQuestionModal .visit-dialog h2{padding-right:35px}
+#bmQuestionModal .bm-question-lead{max-width:540px}
+#bmQuestionModal .bm-question-form{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px}
+#bmQuestionModal .bm-question-field{display:flex;flex-direction:column;gap:7px;min-width:0}
+#bmQuestionModal .bm-question-field.wide{grid-column:1/-1}
+#bmQuestionModal label{color:#173e32;font-weight:750;font-size:14px}
+#bmQuestionModal input,#bmQuestionModal textarea{width:100%;box-sizing:border-box;border:1px solid #abbcaf;border-radius:10px;padding:13px 14px;background:#fff;color:#172d24;font:inherit;font-size:16px}
+#bmQuestionModal textarea{min-height:122px;resize:vertical}
+#bmQuestionModal input:focus-visible,#bmQuestionModal textarea:focus-visible{outline:3px solid #80b3a5;outline-offset:1px}
+#bmQuestionModal .bm-question-submit{border:0;border-radius:999px;background:#173e32;color:#fff;padding:15px 24px;font:inherit;font-weight:800;cursor:pointer}
+#bmQuestionModal .bm-question-note{font-size:13px;line-height:1.5;color:#51675c}
+#bmQuestionModal .bm-question-status{min-height:1.5em;color:#173e32;font-weight:650;overflow-wrap:anywhere}
+#bmQuestionModal .bm-question-fallback{border:1px solid #173e32;color:#173e32;background:transparent;border-radius:999px;padding:12px 20px;font:inherit;font-weight:750;cursor:pointer}
+#bmQuestionModal .bm-question-fallback[hidden]{display:none!important}
+@media(max-width:850px){#internalPage .bm-sunday34 .bm-question-section{grid-template-columns:1fr;gap:24px;padding:65px clamp(24px,5vw,60px)}}
+@media(max-width:560px){#internalPage .bm-sunday34 .bm-question-section h2{font-size:clamp(43px,10vw,60px)}#bmQuestionModal .bm-question-form{grid-template-columns:1fr}}
 </style></head><body><div class="topline">SUNDAYS AT 10:00 AM · GUZMAN HALL · SAN RAFAEL</div><header class="nav" id="nav"><a aria-label="BayMarin Home" class="wordmark" data-baymarin-target="home" role="button" tabindex="0">baymarin<span>CHURCH</span></a><div class="navright"><nav aria-label="Primary" class="desktopnav"><div class="bm-navdrop"><button type="button" class="bm-navdrop-toggle" aria-expanded="false">I'M NEW HERE <span>⌄</span></button><div class="bm-navdrop-links"><a data-baymarin-target="new" role="button" tabindex="0">Sundays</a><a data-baymarin-target="starting-point" role="button" tabindex="0">Starting Point</a><a data-baymarin-target="membership" role="button" tabindex="0">Membership Matters</a><a data-baymarin-target="about" role="button" tabindex="0">About Us</a></div></div><a data-baymarin-target="grow" role="button" tabindex="0">GROW</a><a data-baymarin-target="serve" role="button" tabindex="0">SERVE</a><a data-baymarin-target="resources" role="button" tabindex="0">RESOURCES</a></nav><button aria-controls="menu" aria-expanded="false" aria-label="Open menu" class="menu-btn" id="menuBtn"><i></i></button></div></header>
 <div aria-label="BayMarin navigation" aria-modal="true" class="overlay" id="menu" role="dialog"><div class="overlay-top"><a aria-label="BayMarin home" class="wordmark" data-baymarin-target="home" role="button" tabindex="0">baymarin<span>CHURCH</span></a><button aria-label="Close menu" class="close" id="closeMenu">×</button></div><div class="menu-grid">
 <div class="menu-group"><button aria-expanded="false" class="accordion-trigger" type="button">I'm New Here<span aria-hidden="true">⌄</span></button><div class="accordion-links"><a data-baymarin-target="new" role="button" tabindex="0">Sundays</a><a data-baymarin-target="starting-point" role="button" tabindex="0">Starting Point</a><a data-baymarin-target="membership" role="button" tabindex="0">Membership Matters</a><a data-baymarin-target="about" role="button" tabindex="0">About Us</a></div></div>
@@ -175,7 +201,7 @@ new:["Sundays at BayMarin","A place for you this Sunday.",`<div class="bm-sunday
 <section class="bm34-split"><div class="bm34-photo"><img src="assets/baymarin-kids-families.jpg" alt="Illustrative image of children and a parent sharing a joyful moment in a welcoming community space" loading="lazy" onerror="this.onerror=null;this.src=&#39;assets/baymarin-6a696a80ab28239a.jpg&#39;"></div><div><span class="kicker">FAMILIES</span><h2>Kids &amp; Families</h2><p>Children and families are welcome at BayMarin. We want every generation to feel included and cared for as we learn and grow together.</p><p>We're confirming the details of available Sunday children's programming and check-in. Please contact us before your visit if you have questions about bringing children.</p><a class="pill green" data-baymarin-target="plan-visit" role="button" tabindex="0">Ask About Your Visit</a></div></section>
 <section class="bm34-split bm34-soft"><div><span class="kicker">GROWING TOGETHER</span><h2>Youth &amp; Community</h2><p>Faith grows through meaningful relationships. BayMarin welcomes young people and families to explore faith, ask questions, and build connections across generations.</p><p>Details about any dedicated middle- or high-school Sunday gatherings will be shared once confirmed by the church.</p><a class="pill dark" data-baymarin-target="contact" role="button" tabindex="0">Ask a Question</a></div><div class="bm34-photo"><img src="assets/baymarin-youth-community.jpg" alt="Illustrative image of a small youth group connecting in a welcoming community space" loading="lazy" onerror="this.onerror=null;this.src=&#39;assets/baymarin-9a999980743a9b67.jpg&#39;"></div></section>
 <section class="bm34-faq"><span class="kicker">BEFORE YOU COME</span><h2>Frequently Asked <em>Questions.</em></h2><div class="bm34-questions"><details><summary>What time should I arrive?</summary><p>Our Sunday gathering begins at 10:00 AM. Arriving a little early gives you time to find Guzman Hall and get settled.</p></details><details><summary>Where do I park?</summary><p>We meet at Guzman Hall on the Dominican University campus, 50 Acacia Ave in San Rafael. We're confirming the best visitor parking and entry instructions; contact BayMarin if you need help before arriving.</p></details><details><summary>What should I wear?</summary><p>Come as you are. Wear whatever helps you feel comfortable.</p></details><details><summary>Is there a place for my kids?</summary><p>Families are welcome. We're confirming age-specific programming and childcare availability. Use Plan Your Visit to ask about your family's needs.</p></details><details><summary>How can I get connected?</summary><p>Start by joining us on Sunday. You can also explore Starting Point, community groups, or serving opportunities and reach out to the BayMarin team.</p></details></div></section>
-<section class="bm34-contact"><span class="kicker">LET US KNOW</span><h2>Have a question?</h2><p>Our team would love to help you feel ready for your first Sunday at BayMarin.</p><div class="page-actions"><a class="pill green" data-baymarin-target="plan-visit" role="button" tabindex="0">Plan Your Visit</a><a class="pill dark" href="mailto:info@baymarin.org?subject=Question%20about%20Sundays" >Ask a Question</a></div><small>Plan Your Visit currently prepares an email draft rather than sending a database submission.</small></section>
+<section class="bm34-contact bm-question-section" aria-labelledby="bmQuestionTitle"><div class="bm-question-heading"><span class="kicker">LET US KNOW</span><h2 id="bmQuestionTitle">Have a <em>Question?</em></h2></div><div class="bm-question-details"><p>Our team would love to help! You can reach us at <a href="mailto:info@baymarin.org">info@baymarin.org</a>, and we'll get back to you as soon as we can.</p><button class="pill green bm-question-open" type="button" data-bm-question-open>Ask a Question</button></div></section>
 </div>`],
 "starting-point":["Starting Point","Find your next step at BayMarin.",panel('Your next step begins here','Starting Point details are being developed for BayMarin. Connect with the team to learn how to get involved.',action('Starting Point at BayMarin','Ask About Starting Point'))],
 "membership":["Membership Matters","Discover what belonging means at BayMarin.",panel('Membership Matters','Membership information is being prepared. Contact the BayMarin team to learn more.',action('Membership at BayMarin','Ask About Membership'))],
@@ -251,5 +277,61 @@ const menu=document.getElementById('menu'),mb=document.getElementById('menuBtn')
   toggle.addEventListener('click',function(){const opened=dropdown.classList.toggle('open');toggle.setAttribute('aria-expanded',String(opened));});
   document.addEventListener('click',function(event){if(!dropdown.contains(event.target))close();else if(event.target.closest('.bm-navdrop-links [data-baymarin-target]'))close()});
   document.addEventListener('keydown',function(event){if(event.key==='Escape'){close();if(dropdown.contains(document.activeElement))toggle.focus()}});
+})();
+</script><div class="visit-modal" id="bmQuestionModal" role="presentation" hidden>
+<section class="visit-dialog" role="dialog" aria-modal="true" aria-labelledby="bmQuestionModalTitle" aria-describedby="bmQuestionModalDesc">
+<button type="button" class="visit-close" id="bmQuestionClose" aria-label="Close question form">×</button>
+<span class="kicker">WE'RE HERE TO HELP</span>
+<h2 id="bmQuestionModalTitle">Ask a <em>Question.</em></h2>
+<p class="bm-question-lead" id="bmQuestionModalDesc">Have a question about visiting BayMarin? Send our team a note. We'd love to hear from you.</p>
+<form id="bmQuestionForm" class="bm-question-form">
+<div class="bm-question-field"><label for="bmQuestionName">Your name *</label><input id="bmQuestionName" name="name" autocomplete="name" required maxlength="120"></div>
+<div class="bm-question-field"><label for="bmQuestionEmail">Email address *</label><input id="bmQuestionEmail" name="email" type="email" autocomplete="email" required maxlength="200"></div>
+<div class="bm-question-field wide"><label for="bmQuestionBody">How can we help? *</label><textarea id="bmQuestionBody" name="message" required maxlength="2500" placeholder="Tell us what you'd like to know..."></textarea></div>
+<div class="bm-question-field wide">
+<button class="bm-question-submit" type="submit">Prepare My Message</button>
+<p class="bm-question-note">This opens your email app with your message prepared. Please press Send there to deliver it to BayMarin. Nothing is sent or saved automatically.</p>
+<button class="bm-question-fallback" type="button" id="bmQuestionCopy" hidden>Copy Message Instead</button>
+<p id="bmQuestionStatus" class="bm-question-status" role="status" aria-live="polite"></p>
+</div></form>
+</section></div>
+<script id="bm-question-form-logic">
+(function(){
+  const modal=document.getElementById('bmQuestionModal');
+  const form=document.getElementById('bmQuestionForm');
+  const close=document.getElementById('bmQuestionClose');
+  const copy=document.getElementById('bmQuestionCopy');
+  const status=document.getElementById('bmQuestionStatus');
+  let previousFocus=null;
+  let messageText='';
+  if(!modal||!form)return;
+  function openQuestion(){previousFocus=document.activeElement;modal.hidden=false;document.body.style.overflow='hidden';status.textContent='';copy.hidden=true;document.getElementById('bmQuestionName').focus();}
+  function closeQuestion(){modal.hidden=true;document.body.style.overflow='';if(previousFocus&&previousFocus.isConnected)previousFocus.focus();}
+  document.addEventListener('click',function(e){const button=e.target.closest('[data-bm-question-open]');if(button){e.preventDefault();openQuestion();}if(e.target===modal)closeQuestion();});
+  close.addEventListener('click',closeQuestion);
+  document.addEventListener('keydown',function(e){
+    if(modal.hidden)return;
+    if(e.key==='Escape'){e.preventDefault();closeQuestion();return;}
+    if(e.key==='Tab'){const focusable=[...modal.querySelectorAll('button:not([hidden]),input,textarea,a[href]')].filter(el=>!el.disabled&&el.getClientRects().length);if(!focusable.length)return;const first=focusable[0],last=focusable[focusable.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}}
+  });
+  form.addEventListener('submit',function(e){
+    e.preventDefault();
+    if(!form.reportValidity())return;
+    const data=new FormData(form);
+    const name=String(data.get('name')||'').trim();
+    const email=String(data.get('email')||'').trim();
+    const question=String(data.get('message')||'').trim();
+    if(!name||!email||!question){status.textContent='Please complete all required fields.';return;}
+    messageText='Hello BayMarin,\n\n'+question+'\n\nFrom: '+name+'\nReply to: '+email;
+    const subject='Question from BayMarin Website - '+name;
+    status.textContent='Your email draft is ready. Please press Send in your email app. If it does not open, select Copy Message Instead.';
+    copy.hidden=false;
+    window.location.href='mailto:info@baymarin.org?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(messageText);
+  });
+  copy.addEventListener('click',async function(){
+    if(!messageText)return;
+    try{await navigator.clipboard.writeText(messageText);status.textContent='Message copied. Paste it into an email to info@baymarin.org and press Send.';}
+    catch(err){status.textContent='Copying is unavailable. Please email your question directly to info@baymarin.org.';}
+  });
 })();
 </script></body></html>

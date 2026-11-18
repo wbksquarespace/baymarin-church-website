@@ -14,6 +14,8 @@ main{max-width:1310px;margin:auto;padding:clamp(24px,5vw,72px)}.kicker{font-size
 <div class="field"><label for="description">Message description *</label><textarea id="description" required maxlength="5000" placeholder="A few sentences about the message…"></textarea></div>
 <div class="field upload"><label for="audio">Sermon audio (MP3 or M4A) *</label><input type="file" id="audio" accept=".mp3,.m4a,audio/mpeg,audio/mp4,audio/x-m4a" required><span class="hint">Maximum 250 MB. Keep a backup of the original audio.</span></div>
 <div class="field upload"><label for="artwork">Message artwork (JPG, PNG or WEBP)</label><input type="file" id="artwork" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"><span class="hint">Use approved, real BayMarin photography; no facial alterations. Optional when default podcast art is configured.</span></div>
+<div class="field"><label>Public message options</label><div class="topic-options"><label><input type="checkbox" id="allowDownload"> Allow visitors to download MP3/M4A audio</label><label><input type="checkbox" id="allowTranscript" checked> Publish an approved transcript when attached</label><label><input type="checkbox" id="shareResources" checked> Display approved sermon notes and slides publicly</label></div><span class="hint">Listeners can always stream published audio. Downloads and documents appear only when enabled.</span></div>
+<div class="field upload"><label for="transcript">Optional corrected transcript (TXT or PDF)</label><input type="file" id="transcript" accept=".txt,.pdf,text/plain,application/pdf"><span class="hint">Upload a reviewed transcript with sermon wording. Up to 15 MB; never publish an unreviewed AI transcription.</span></div>
 <div class="field upload"><label for="notes">Optional sermon notes (PDF, DOCX or TXT)</label><input type="file" id="notes" accept=".pdf,.docx,.txt,application/pdf,text/plain,application/vnd.openxmlformats-officedocument.wordprocessingml.document"><span class="hint">Up to 15 MB. Only upload documents approved for public sharing.</span></div>
 <div class="field upload"><label for="slides">Optional presentation / slide deck (PDF or PPTX)</label><input type="file" id="slides" accept=".pdf,.pptx,application/pdf,application/vnd.openxmlformats-officedocument.presentationml.presentation"><span class="hint">Up to 50 MB. Public visitors can view the attached slides from the message library.</span></div>
 <div class="buttons"><button class="subtle" id="previewBtn" type="button">Update preview</button><button class="primary" id="publish" type="submit">Publish message →</button></div><p id="notice" class="alert" role="status" aria-live="polite"></p></form></section>
@@ -28,7 +30,7 @@ import {getStorage,ref,uploadBytesResumable} from "https://www.gstatic.com/fireb
 const $=id=>document.getElementById(id),info=t=>$("notice").textContent=t;
 const api="https://us-west1-bay-marin-church-website.cloudfunctions.net/publishMessage";
 let auth,db,storage,authorized=false;
-const data=()=>({title:$("title").value.trim(),series:$("series").value.trim(),speaker:$("speaker").value.trim(),date:$("date").value,description:$("description").value.trim(),topics:[...document.querySelectorAll('input[name="topic"]:checked')].map(x=>x.value)});
+const data=()=>({title:$("title").value.trim(),series:$("series").value.trim(),speaker:$("speaker").value.trim(),date:$("date").value,description:$("description").value.trim(),allowDownload:$("allowDownload").checked,shareResources:$("shareResources").checked,allowTranscript:$("allowTranscript").checked,topics:[...document.querySelectorAll('input[name="topic"]:checked')].map(x=>x.value)});
 const objectUrl={art:null,audio:null};
 function preview(){
  const d=data();$("titlePreview").textContent=d.title||"Your message title";
@@ -43,7 +45,7 @@ function preview(){
  if(audio){objectUrl.audio=URL.createObjectURL(audio);$("audioPreview").src=objectUrl.audio;$("audioPreview").hidden=false;}
 }
 $("previewBtn").onclick=preview;
-["title","series","speaker","date","description","audio","artwork","notes","slides"].forEach(id=>$(id).addEventListener("change",preview));
+["title","series","speaker","date","description","audio","artwork","notes","slides","transcript"].forEach(id=>$(id).addEventListener("change",preview));
 document.querySelectorAll('input[name="topic"]').forEach(x=>x.addEventListener("change",preview));
 $("date").value=new Date().toISOString().slice(0,10);
 const configUrl="/__/firebase/init.json";
@@ -81,12 +83,13 @@ function upload(path,file){
 $("messageForm").onsubmit=async event=>{
  event.preventDefault();
  if(!authorized||!auth?.currentUser){info("Sign in as an approved publisher first.");return;}
- const audio=$("audio").files[0],art=$("artwork").files[0],notes=$("notes").files[0],slides=$("slides").files[0],d=data();
+ const audio=$("audio").files[0],art=$("artwork").files[0],notes=$("notes").files[0],slides=$("slides").files[0],transcript=$("transcript").files[0],d=data();
  if(!audio||!(/\.(mp3|m4a)$/i.test(audio.name))||audio.size>250*1024*1024)return info("Please use an MP3 or M4A file smaller than 250 MB.");
  if(art&&(!(/\.(jpg|jpeg|png|webp)$/i.test(art.name))||art.size>12*1024*1024))return info("Please choose JPG, PNG, or WEBP artwork smaller than 12 MB.");
  if(!d.title||!d.speaker||!d.series||!d.date||!d.description)return info("Complete every required message field.");
  if(notes&&(!/\.(pdf|docx|txt)$/i.test(notes.name)||notes.size>15*1024*1024))return info("Notes must be PDF, DOCX or TXT and under 15 MB.");
  if(slides&&(!/\.(pdf|pptx)$/i.test(slides.name)||slides.size>50*1024*1024))return info("Slides must be PDF or PPTX and under 50 MB.");
+ if(transcript&&(!/\.(txt|pdf)$/i.test(transcript.name)||transcript.size>15*1024*1024))return info("Transcript must be a reviewed TXT or PDF under 15 MB.");
  const submit=$("publish");submit.disabled=true;
  try{
   const uid=auth.currentUser.uid,id=crypto.randomUUID(),folder="sermons/"+uid+"/"+id+"/";
@@ -94,12 +97,13 @@ $("messageForm").onsubmit=async event=>{
   await upload(filePath,audio);
   let artPath="";
   if(art){info("Uploading artwork…");artPath=folder+"artwork."+art.name.split(".").pop().toLowerCase();await upload(artPath,art);}
-  let notesPath="",slidesPath="";
+  let notesPath="",slidesPath="",transcriptPath="";
   if(notes){info("Uploading sermon notes…");notesPath=folder+"notes."+notes.name.split(".").pop().toLowerCase();await upload(notesPath,notes);}
   if(slides){info("Uploading presentation slides…");slidesPath=folder+"slides."+slides.name.split(".").pop().toLowerCase();await upload(slidesPath,slides);}
+  if(transcript){info("Uploading approved transcript…");transcriptPath=folder+"transcript."+transcript.name.split(".").pop().toLowerCase();await upload(transcriptPath,transcript);}
   info("Finalizing message on BayMarin…");
   const token=await auth.currentUser.getIdToken();
-  const response=await fetch(api,{method:"POST",headers:{"Authorization":"Bearer "+token,"Content-Type":"application/json"},body:JSON.stringify({...d,id,audioPath:filePath,artworkPath:artPath,notesPath,slidesPath,audioBytes:audio.size})});
+  const response=await fetch(api,{method:"POST",headers:{"Authorization":"Bearer "+token,"Content-Type":"application/json"},body:JSON.stringify({...d,id,audioPath:filePath,artworkPath:artPath,notesPath,slidesPath,transcriptPath,audioBytes:audio.size})});
   const result=await response.json();if(!response.ok||!result.ok)throw Error(result.message||"Could not publish");
   info("Published successfully! The website and podcast feed now contain this message. Spotify updates after it checks the feed.");
   $("messageForm").reset();$("audioPreview").hidden=true;

@@ -185,6 +185,7 @@ const menu=document.getElementById('menu'),mb=document.getElementById('menuBtn')
   const links=dropdown.querySelector('.bm-navdrop-links');
   if(links)links.setAttribute('aria-label',"I'm New Here pages");
   function close(){dropdown.classList.remove('open');toggle.setAttribute('aria-expanded','false')}
+  toggle.addEventListener('click',function(){const opened=dropdown.classList.toggle('open');toggle.setAttribute('aria-expanded',String(opened));});
   document.addEventListener('click',function(event){if(!dropdown.contains(event.target))close();else if(event.target.closest('.bm-navdrop-links [data-baymarin-target]'))close()});
   document.addEventListener('keydown',function(event){if(event.key==='Escape'){close();if(dropdown.contains(document.activeElement))toggle.focus()}});
 })();

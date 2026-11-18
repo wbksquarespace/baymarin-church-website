@@ -33,6 +33,21 @@ function checkRate(ip){
  current.count++;hits.set(ip,current);
  return current.count<=10;
 }
+
+function brandedEmail(title,introduction,content,buttonLabel,buttonHref){
+ const p=(text)=>"<p style=\"font-size:16px;line-height:1.7;color:#27463a;margin:0 0 18px\">"+escapeHtml(text)+"</p>";
+ return "<!doctype html><html><body style=\"margin:0;padding:0;background:#edf2ed;font-family:Arial,Helvetica,sans-serif\">"+
+ "<div style=\"display:none;max-height:0;overflow:hidden\">A note from your BayMarin community</div>"+
+ "<table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"background:#edf2ed\"><tr><td align=\"center\" style=\"padding:35px 16px\">"+
+ "<table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\" width=\"600\" style=\"width:100%;max-width:600px;background:#fff;border-radius:22px;overflow:hidden\">"+
+ "<tr><td style=\"background:#123e32;padding:28px 35px;color:#fff;font-size:25px;font-weight:800;letter-spacing:-.7px\">BayMarin<span style=\"font-size:11px;font-weight:400;letter-spacing:2px;display:block;margin-top:8px\">THERE IS ROOM TO BELONG</span></td></tr>"+
+ "<tr><td style=\"padding:40px 36px 30px\"><div style=\"color:#42806b;font-size:12px;font-weight:800;letter-spacing:2px;margin-bottom:14px\">"+escapeHtml(introduction)+"</div>"+
+ "<h1 style=\"color:#173d31;font-size:37px;line-height:1.13;letter-spacing:-1px;margin:0 0 24px\">"+escapeHtml(title)+"</h1>"+
+ content.map(p).join("")+
+ (buttonHref?"<p style=\"margin:28px 0\"><a href=\""+escapeHtml(buttonHref)+"\" style=\"background:#143e33;color:#fff;text-decoration:none;border-radius:50px;display:inline-block;padding:15px 24px;font-weight:750\">"+escapeHtml(buttonLabel||"LEARN MORE")+"</a></p>":"")+
+ "</td></tr><tr><td style=\"background:#eaf1ec;padding:24px 36px;color:#486655;font-size:13px;line-height:1.65\">BayMarin Church · Sundays at 10:00 AM<br>Guzman Hall, Dominican University · San Rafael, CA<br>Questions? Reply to this email or contact info@baymarin.org</td></tr>"+
+ "</table></td></tr></table></body></html>";
+}
 function createMail(data){
  const isVisit=data.kind==="visit";
  const name=isVisit?string(data.first,80)+" "+string(data.last,80):string(data.name,120);
@@ -56,7 +71,18 @@ function createMail(data){
  const staffMessage={from:mailFrom.value(),to:[STAFF_EMAIL],reply_to:email,
   subject:subject+" — "+name.trim(),html:"<h2>New "+escapeHtml(isVisit?"visit request":"question")+"</h2><table cellspacing='0' border='0' style='border-collapse:collapse'>"+htmlRows+"</table>"};
  const replyMessage={from:mailFrom.value(),to:[email],reply_to:STAFF_EMAIL,
-  subject:"We received your message — BayMarin Church",text:acknowledgement};
+  subject:isVisit?"You're welcome at BayMarin — visit confirmation":"We received your message — BayMarin Church",
+  text:acknowledgement,
+  html:isVisit?brandedEmail("We look forward to welcoming you!","YOUR VISIT IS ON OUR CALENDAR",[
+   "Hi "+cleanName+", thanks for planning a visit to BayMarin on "+string(data.date,20)+".",
+   "Sunday gathering: 10:00 AM at "+VISIT_ADDRESS+".",
+   "Come as you are. You don't need to know anyone or have everything figured out. Our team will review your request and aims to respond within 24–48 hours.",
+   data.reminders===true?"You've also asked for helpful email reminders before Sunday.":"Email reminders are off. You can always reach us at info@baymarin.org."
+  ],"GET DIRECTIONS",VISIT_MAP)
+  :brandedEmail("Your message is with us.","THANK YOU FOR REACHING OUT",[
+   "Hi "+cleanName+", your message has been received by BayMarin.",
+   "Someone from our staff team will review it and aims to reply within 24–48 hours, often sooner."
+  ],"EXPLORE BAYMARIN","https://bay-marin-church-website.web.app")};
  return [staffMessage,replyMessage];
 }
 exports.submitForm=onRequest({region:"us-west1",cors:["https://bay-marin-church-website.web.app","https://bay-marin-church-website.firebaseapp.com","https://baymarin.org","https://www.baymarin.org"],invoker:"public",secrets:[mailKey,mailFrom],maxInstances:5,timeoutSeconds:20},async(req,res)=>{
@@ -119,7 +145,7 @@ exports.submitForm=onRequest({region:"us-west1",cors:["https://bay-marin-church-
      const reminderMorning=new Date(visitAt.getTime()-2*3600000);
      const now=Date.now();
      if(visitAt.getTime()>now){
-       const stages=[{stage:"before",at:reminder48},{stage:"morning",at:reminderMorning}].filter(x=>x.at.getTime()>now);
+       const stages=[{stage:"before",at:reminder48},{stage:"morning",at:reminderMorning},{stage:"after",at:new Date(visitAt.getTime()+24*3600000)}].filter(x=>x.at.getTime()>now);
        if(stages.length){
          const id=crypto.randomUUID();
          await getFirestore().collection(EVENT_COLLECTION).doc(id).set({
@@ -142,8 +168,15 @@ function reminderMessage(record,stage){
  const short=record.name||"there";
  const when=stage==="before"?"in two days":"this morning";
  const subject=stage==="before"?"Your Sunday visit is coming up — BayMarin Church":"We're looking forward to seeing you today — BayMarin";
- return {from:mailFrom.value(),to:[record.email],reply_to:STAFF_EMAIL,subject,
-  text:"Hi "+short+",\n\nJust a friendly reminder: your BayMarin visit is "+when+"!\n\nSunday worship: 10:00 AM\nLocation: "+VISIT_ADDRESS+"\nGet directions: "+VISIT_MAP+"\n\nCome as you are. We're looking forward to meeting you. If your plans change or you would like to stop visit reminders, please reply to this email and let the BayMarin team know.\n\nBayMarin Church\ninfo@baymarin.org"};
+ const after=stage==="after";
+ const title=after?"Thanks for connecting with BayMarin!":stage==="before"?"Sunday is almost here.":"Welcome to Sunday at BayMarin!";
+ const message=after
+  ?["Hi "+short+", we hope your weekend went well.","Whether you were able to visit or your plans changed, we'd love to help you find your next step. Have a question or want to connect? Just reply to this email."]
+  :["Hi "+short+", a friendly reminder that your BayMarin visit is "+when+".","We gather at 10:00 AM at "+VISIT_ADDRESS+". There's room for you, and we're glad you're considering joining us.","Need to change your plans or stop reminders? Reply to this email and let us know."];
+ return {from:mailFrom.value(),to:[record.email],reply_to:STAFF_EMAIL,subject:after?"A note from BayMarin after Sunday":subject,
+  text:message.join("\\n\\n")+"\\n\\nBayMarin Church\\ninfo@baymarin.org",
+  html:brandedEmail(title,after?"STAY CONNECTED":"PLAN YOUR VISIT",message,after?"EXPLORE WAYS TO CONNECT":"GET DIRECTIONS",after?"https://baymarin.churchcenter.com/home":VISIT_MAP)
+ };
 }
 exports.sendVisitReminders=onSchedule({schedule:"every 30 minutes",timeZone:VISIT_TIMEZONE,region:"us-west1",secrets:[mailKey,mailFrom],maxInstances:1,timeoutSeconds:120},async()=>{
  const db=getFirestore();
@@ -169,8 +202,11 @@ exports.sendVisitReminders=onSchedule({schedule:"every 30 minutes",timeZone:VISI
    if(!reply.ok)throw new Error("Provider status "+reply.status);
    const visitMs=record.visitAt.toMillis();
    const morningMs=visitMs-2*3600000;
+   const afterMs=visitMs+24*3600000;
    if(record.reminderStage==="before"&&morningMs>Date.now()){
     await snap.ref.update({reminderStage:"morning",nextReminderAt:Timestamp.fromMillis(morningMs),attempts:0});
+   }else if(record.reminderStage!=="after"&&afterMs>Date.now()){
+    await snap.ref.update({reminderStage:"after",nextReminderAt:Timestamp.fromMillis(afterMs),attempts:0});
    }else{
     await snap.ref.delete();
    }

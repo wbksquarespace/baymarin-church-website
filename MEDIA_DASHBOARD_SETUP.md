@@ -67,3 +67,26 @@ The `/media-team/` login deliberately blocks publishing if Firebase config or pu
 
 ## Spotify caveat
 BayMarin's current audio library is on Squarespace. A podcast RSS show listed in Spotify may already be tied to a hosting service. Verify ownership and existing distribution before switching. This dashboard publishes a church-controlled RSS feed; Spotify's own schedule controls when new entries appear.
+
+## Advanced message library (November 2026)
+The public message library includes:
+- Search by published sermon title, date, speaker, series, and inferred topics.
+- Save for Later bookmarks stored in the visitor's current browser (not synced across devices).
+- Remember playback position in this browser, choose playback speed, and advance to the next sermon in the current series.
+- Shareable message URLs and accessible audio controls.
+- Optional audio download control: the media team must enable it for each sermon; cross-origin legacy recordings may open in the browser instead of downloading. Migrated first-party Firebase files are the recommended download source.
+- Optional reviewed TXT/PDF transcript, shareable notes, and PDF/PPTX sermon slides. Approved TXT text is indexed into message search and can be read alongside the audio.
+- Media publisher checkboxes: `allowDownload`, `allowTranscript`, and `shareResources`.
+- Imported public historical index includes 230 published recordings; copying their actual audio bytes into Firebase Storage is a separate authorized migration.
+
+**Important limitation:** The saved position, bookmarks and playback preferences remain in the visitor's local browser. They do not currently sync to Firebase accounts. Automatic AI transcription and semantic transcript search require an additional speech-to-text pipeline and a review/approval step; only approved, supplied plain-text transcripts are searchable by their spoken words now.
+
+## Deployment and activation blockers recorded November 18, 2026
+Hosting deployments have succeeded, but Cloud Function deployments do **not** succeed yet because the configured GitHub credential cannot enable Google Cloud APIs. Latest contact-form run reports `cloudbuild.googleapis.com` not enabled and `artifactregistry.googleapis.com` missing. Latest sermon deployment reports `firebasestorage.googleapis.com` not enabled.
+
+An authorized Google Cloud project administrator must enable these APIs in the BayMarin project:
+- Cloud Build API: `https://console.cloud.google.com/apis/library/cloudbuild.googleapis.com?project=bay-marin-church-website`
+- Artifact Registry API: `https://console.cloud.google.com/apis/library/artifactregistry.googleapis.com?project=bay-marin-church-website`
+- Cloud Storage for Firebase API: `https://console.cloud.google.com/apis/library/firebasestorage.googleapis.com?project=bay-marin-church-website`
+
+Verify the Blaze billing plan, default Storage bucket and Firestore are ready, Google sign-in is enabled, and publisher UID permissions exist. Then redeploy the secured rules and functions, and only then run the archive transfer. Avoid claiming Firebase migration, live media uploading, download fulfillment, or Spotify automatic publishing is active until these components pass end-to-end tests.

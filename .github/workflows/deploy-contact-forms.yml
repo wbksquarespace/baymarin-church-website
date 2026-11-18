@@ -2,6 +2,13 @@ name: Deploy BayMarin Contact Forms API
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "functions/index.js"
+      - "functions/package.json"
+      - ".github/workflows/deploy-contact-forms.yml"
 
 permissions:
   contents: read
@@ -23,7 +30,7 @@ jobs:
       - name: Validate Cloud Functions source
         run: node --check functions/index.js
       - name: Install dependencies
-        run: npm --prefix functions ci
+        run: npm --prefix functions install --no-audit --no-fund
       - name: Authenticate to Firebase
         uses: google-github-actions/auth@v2
         with:

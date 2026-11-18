@@ -50,9 +50,10 @@ function brandedEmail(title,introduction,content,buttonLabel,buttonHref){
 }
 function createMail(data){
  const isVisit=data.kind==="visit";
+ const isConnect=data.kind==="connect";
  const name=isVisit?string(data.first,80)+" "+string(data.last,80):string(data.name,120);
  const email=string(data.email,200);
- const subject=isVisit?"Plan My Visit - BayMarin":"Question from BayMarin Website";
+ const subject=isVisit?"Plan My Visit - BayMarin":isConnect?"Stay Connected - BayMarin":"Question from BayMarin Website";
  const rows=isVisit?[
   ["Name",name],["Email",email],["Phone",string(data.phone,80)||"Not provided"],
   ["Visit date",string(data.date,20)],["Service",string(data.service,120)],
@@ -62,7 +63,7 @@ function createMail(data){
   ["How they heard",string(data.how,150)||"Not provided"],
   ["Questions",string(data.help,1500)||"None"],
   ["Follow-up requested",data.contact?"Yes":"No"],["Email reminders opted in",data.reminders===true?"Yes":"No"]
- ]:[["Name",name],["Email",email],["Message",string(data.message,2500)]];
+ ]:isConnect?[["Name",name],["Email",email],["Request","Please help me stay connected with BayMarin."]]:[["Name",name],["Email",email],["Message",string(data.message,2500)]];
  const htmlRows=rows.map(([a,b])=>"<tr><th align='left' style='padding:9px;background:#edf3ee;vertical-align:top'>"+escapeHtml(a)+"</th><td style='padding:9px;white-space:pre-wrap'>"+escapeHtml(b)+"</td></tr>").join("");
  const cleanName=name.trim().split(/\s+/)[0].replace(/[^\p{L}\p{N}'-]/gu,"").slice(0,50)||"there";
  const acknowledgement=isVisit
@@ -71,7 +72,7 @@ function createMail(data){
  const staffMessage={from:mailFrom.value(),to:[STAFF_EMAIL],reply_to:email,
   subject:subject+" — "+name.trim(),html:"<h2>New "+escapeHtml(isVisit?"visit request":"question")+"</h2><table cellspacing='0' border='0' style='border-collapse:collapse'>"+htmlRows+"</table>"};
  const replyMessage={from:mailFrom.value(),to:[email],reply_to:STAFF_EMAIL,
-  subject:isVisit?"You're welcome at BayMarin — visit confirmation":"We received your message — BayMarin Church",
+  subject:isVisit?"You're welcome at BayMarin — visit confirmation":isConnect?"You're connected with BayMarin":"We received your message — BayMarin Church",
   text:acknowledgement,
   html:isVisit?brandedEmail("We look forward to welcoming you!","YOUR VISIT IS ON OUR CALENDAR",[
    "Hi "+cleanName+", thanks for planning a visit to BayMarin on "+string(data.date,20)+".",
@@ -79,6 +80,11 @@ function createMail(data){
    "Come as you are. You don't need to know anyone or have everything figured out. Our team will review your request and aims to respond within 24–48 hours.",
    data.reminders===true?"You've also asked for helpful email reminders before Sunday.":"Email reminders are off. You can always reach us at info@baymarin.org."
   ],"GET DIRECTIONS",VISIT_MAP)
+  :isConnect?brandedEmail("Glad you connected with us!","WELCOME TO BAYMARIN",[
+   "Hi "+cleanName+", thanks for reaching out to BayMarin.",
+   "Our team received your contact request and aims to get back to you within 24–48 hours.",
+   "You can also see current connections and gatherings through Church Center."
+  ],"EXPLORE CHURCH CENTER","https://baymarin.churchcenter.com/home")
   :brandedEmail("Your message is with us.","THANK YOU FOR REACHING OUT",[
    "Hi "+cleanName+", your message has been received by BayMarin.",
    "Someone from our staff team will review it and aims to reply within 24–48 hours, often sooner."
@@ -98,8 +104,8 @@ exports.submitForm=onRequest({region:"us-west1",cors:["https://bay-marin-church-
  if(!data||typeof data!=="object"||Array.isArray(data))return bad(res,400,"Invalid form data.");
  if(string(data.website,200))return bad(res,400,"Unable to submit this request.");
  if(!checkRate(req.ip||"unknown"))return bad(res,429,"Too many messages. Please try again later.");
- const isVisit=data.kind==="visit",isQuestion=data.kind==="question";
- if(!isVisit&&!isQuestion)return bad(res,400,"Unknown form type.");
+ const isVisit=data.kind==="visit",isQuestion=data.kind==="question",isConnect=data.kind==="connect";
+ if(!isVisit&&!isQuestion&&!isConnect)return bad(res,400,"Unknown form type.");
  const email=string(data.email,200);
  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))return bad(res,400,"Please enter a valid email address.");
  if(isVisit){
@@ -116,7 +122,7 @@ exports.submitForm=onRequest({region:"us-west1",cors:["https://bay-marin-church-
   if(!string(data.first,80)||!string(data.last,80)||!/^\d{4}-\d{2}-\d{2}$/.test(string(data.date,20))||
     !string(data.service,120)||!string(data.location,150)||!["Yes","No","Not sure"].includes(string(data.children,30)))
     return bad(res,400,"Please complete all required visit fields.");
- }else if(!string(data.name,120)||!string(data.message,2500))
+ }else if(!string(data.name,120)||(isQuestion&&!string(data.message,2500)))
   return bad(res,400,"Please include your name and question.");
  try{
 
@@ -174,7 +180,7 @@ function reminderMessage(record,stage){
   ?["Hi "+short+", we hope your weekend went well.","Whether you were able to visit or your plans changed, we'd love to help you find your next step. Have a question or want to connect? Just reply to this email."]
   :["Hi "+short+", a friendly reminder that your BayMarin visit is "+when+".","We gather at 10:00 AM at "+VISIT_ADDRESS+". There's room for you, and we're glad you're considering joining us.","Need to change your plans or stop reminders? Reply to this email and let us know."];
  return {from:mailFrom.value(),to:[record.email],reply_to:STAFF_EMAIL,subject:after?"A note from BayMarin after Sunday":subject,
-  text:message.join("\\n\\n")+"\\n\\nBayMarin Church\\ninfo@baymarin.org",
+  text:message.join("\n\n")+"\n\nBayMarin Church\ninfo@baymarin.org",
   html:brandedEmail(title,after?"STAY CONNECTED":"PLAN YOUR VISIT",message,after?"EXPLORE WAYS TO CONNECT":"GET DIRECTIONS",after?"https://baymarin.churchcenter.com/home":VISIT_MAP)
  };
 }

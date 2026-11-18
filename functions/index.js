@@ -182,7 +182,7 @@ function reminderMessage(record,stage){
   :["Hi "+short+", a friendly reminder that your BayMarin visit is "+when+".","We gather at 10:00 AM at "+VISIT_ADDRESS+". There's room for you, and we're glad you're considering joining us.","Need to change your plans or stop reminders? Reply to this email and let us know."];
  return {from:mailFrom.value(),to:[record.email],reply_to:STAFF_EMAIL,subject:after?"A note from BayMarin after Sunday":subject,
   text:message.join("\n\n")+"\n\nBayMarin Church\ninfo@baymarin.org",
-  html:brandedEmail(title,after?"STAY CONNECTED":"PLAN YOUR VISIT",message,after?"EXPLORE WAYS TO CONNECT":"GET DIRECTIONS",after?"https://baymarin.churchcenter.com/home":VISIT_MAP)+(stopUrl?'<p style="text-align:center;font:13px Arial,sans-serif;color:#315f4c;padding:14px"><a href="'+escapeHtml(stopUrl)+'" style="color:#315f4c">Stop visit reminders</a></p>':'')
+  html:brandedEmail(title,after?"STAY CONNECTED":"PLAN YOUR VISIT",message,after?"EXPLORE WAYS TO CONNECT":"GET DIRECTIONS",after?"https://baymarin.churchcenter.com/home":VISIT_MAP).replace("</body>",(stopUrl?'<p style="text-align:center;font:13px Arial,sans-serif;color:#315f4c;padding:14px"><a href="'+escapeHtml(stopUrl)+'" style="color:#315f4c">Stop visit reminders</a></p>':'')+"</body>")
  };
 }
 exports.sendVisitReminders=onSchedule({schedule:"every 30 minutes",timeZone:VISIT_TIMEZONE,region:"us-west1",secrets:[mailKey,mailFrom],maxInstances:1,timeoutSeconds:120},async()=>{
